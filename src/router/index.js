@@ -9,6 +9,11 @@ const routes = [
     path: "/",
     name: "Clipboard",
     component: Clipboard
+  },
+  {
+    path: "/useful",
+    name: "useful",
+    component: Clipboard
   }
 ];
 

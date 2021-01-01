@@ -1,7 +1,9 @@
 "use strict";
+/* global __static */
 import { globalShortcut, screen, app, protocol, BrowserWindow } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
+import { autoUpdater } from "electron-updater";
 import initTray from "@/tray";
 import path from "path";
 
@@ -30,7 +32,8 @@ async function createWindow() {
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       experimentalFeatures: true,
       enableRemoteModule: true,
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
+      preload: path.join(__dirname, "preload.js")
     },
     alwaysOnTop: true,
     resizable: false,
@@ -40,7 +43,8 @@ async function createWindow() {
     hasShadow: true,
     skipTaskbar: true,
     vibrancy: "light", //macos
-    icon: path.join(__dirname, "../src/assets/logo.png"),
+    // icon: path.join(__dirname, "../src/assets/favicon.ico"),
+    icon: path.join(__static, "icon.png"),
     title: "ClipBoard",
     titleBarStyle: "hidden",
     show: false
@@ -54,6 +58,7 @@ async function createWindow() {
     createProtocol("app");
     // Load the index.html when not in development
     win.loadURL("app://./index.html");
+    autoUpdater.checkForUpdatesAndNotify();
   }
 
   initTray(app, win);
@@ -133,3 +138,36 @@ if (isDevelopment) {
     });
   }
 }
+
+// autoUpdater.setFeedURL({
+//   provider: "generic", // 亦可使用 Github
+//   url: "your url"
+// });
+// autoUpdater.autoDownload = false; // 不自動下載更新檔
+//
+// // 有更新檔可下載
+// autoUpdater.on("update-available", info => {
+//   // do something...
+// });
+// // 沒有更新檔可下載
+// autoUpdater.on("update-not-available", info => {
+//   // do something...
+// });
+// // 下載進度，開始下載後會持續觸發此事件
+// autoUpdater.on("download-progress", info => {
+//   console.log(info.percent);
+// });
+// // 下載完成
+// autoUpdater.on(
+//   "update-downloaded",
+//   (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) => {
+//     autoUpdater.quitAndInstall();
+//   }
+// );
+// // 錯誤
+// autoUpdater.on("error", function() {
+//   // do something...
+// });
+//
+// // 開始下載更新
+// autoUpdater.checkForUpdates();

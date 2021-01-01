@@ -1,3 +1,5 @@
+/* global __static */
+
 import { Menu, Tray, dialog } from "electron";
 import path from "path";
 import pkg from "../../package.json";
@@ -20,6 +22,16 @@ export default function initTray(app, win) {
       ]
     },
     {
+      label: "©版本信息",
+      click: () => {
+        dialog.showMessageBox({
+          title: "Electron Clipboard",
+          message: "Electron Clipboard",
+          detail: `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub:${pkg.github}\nDescription:${pkg.description}`
+        });
+      }
+    },
+    {
       label: "📓使用手册",
       click: () => {
         dialog.showMessageBox({
@@ -27,16 +39,6 @@ export default function initTray(app, win) {
           message: "使用手册",
           detail:
             "【Esc】: 隐藏剪切板\n【Alt+V】: 呼出剪贴板\n【Enter】: 粘贴选中\n【→】: 选中下一个\n【←】: 选中上一个"
-        });
-      }
-    },
-    {
-      label: "🛈版本信息",
-      click: () => {
-        dialog.showMessageBox({
-          title: "Electron Clipboard",
-          message: "Electron Clipboard",
-          detail: `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub:${pkg.github}\nDescription:${pkg.description}`
         });
       }
     },
@@ -67,7 +69,9 @@ export default function initTray(app, win) {
   const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
 
   // 用一个 Tray 来表示一个图标,这个图标处于正在运行的系统的通知区
-  const iconPath = path.join(__dirname, "../src/assets/logo.png");
+  // const iconPath = path.join(__dirname, "../src/assets/favicon.ico");
+  const iconPath = path.join(__static, "icon.png");
+
   const appTray = new Tray(iconPath);
   // 设置托盘悬浮提示
   appTray.setToolTip("Electron Clipboard");

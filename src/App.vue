@@ -46,5 +46,9 @@ html {
 
 .el-main {
   padding: 0 20px !important;
+  height: 410px;
+}
+.el-header {
+  height: unset !important;
 }
 </style>

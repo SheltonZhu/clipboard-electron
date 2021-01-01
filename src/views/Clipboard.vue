@@ -23,25 +23,6 @@
           -site:*csdn.net
         </p>
         <p>{{ i }}</p>
-        <code>
-          export default { data() { return { currentDate: new Date() }; } }
-        </code>
-        <code>
-          export default { data() { return { currentDate: new Date() }; } }
-        </code>
-        <code>
-          export default { data() { return { currentDate: new Date() }; } }
-        </code>
-        <code>
-          export default { data() { return { currentDate: new Date() }; } }
-        </code>
-        <code>
-          export default { data() { return { currentDate: new Date() }; } }
-        </code>
-        <p class="time">{{ new Date().toLocaleString() }}</p>
-
-        <p class="time">{{ new Date().toLocaleString() }}</p>
-
         <p class="time">{{ new Date().toLocaleString() }}</p>
       </div>
       <div class="other-info">
@@ -73,7 +54,13 @@ export default {
       this.pasteAndHide();
     },
     pasteAndHide() {
+      // this.$electron.remote.clipboard.writeText('Example String')
+      // console.log(this.$electron.remote.clipboard.readText('selection'))
+      // this.write2clipboard(e.target.toString());
       this.$electron.remote.getCurrentWindow().hide();
+    },
+    write2clipboard(src) {
+      this.$electron.remote.clipboard.writeText(src);
     }
   }
 };
@@ -94,6 +81,7 @@ export default {
   overflow-x: scroll;
   overflow-y: hidden;
   white-space: nowrap;
+  outline: none;
 }
 
 .clipboard .box-card {

@@ -1,8 +1,8 @@
 {
-  "name": "my-electron-clipboard",
-  "version": "0.1.0",
+  "name": "clipboard",
+  "version": "0.0.1",
   "author": "Selton Zhu",
-  "github": "https://github.com/",
+  "github": "https://github.com/SheltonZhu/clipboard-electron",
   "description": "My Electron clipboard app",
   "private": true,
   "scripts": {
@@ -10,13 +10,17 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
+    "electron:build:dev": "vue-cli-service electron:build --mode development",
     "electron:serve": "vue-cli-service electron:serve",
+    "electron:generate-icons": "electron-icon-builder --input=./public/icon.png --output=build --flatten",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps"
   },
   "main": "background.js",
   "dependencies": {
+    "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "electron-updater": "^4.3.5",
     "electron-vue": "^0.0.1",
     "element-ui": "^2.3.6",
     "vue": "^2.6.11",
