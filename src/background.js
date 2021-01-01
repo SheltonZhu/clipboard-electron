@@ -3,6 +3,7 @@ import { globalShortcut, screen, app, protocol, BrowserWindow } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import initTray from "@/tray";
+import path from "path";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 // Scheme must be registered before the app is ready
@@ -21,24 +22,28 @@ async function createWindow() {
     height: winHeight,
     x: 0,
     y: offsetY,
-    // frame: false,
+    frame: false,
     transparent: true,
     // backgroundColor: "#ffffff00",
     webPreferences: {
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
       experimentalFeatures: true,
+      enableRemoteModule: true,
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION
     },
-    // alwaysOnTop: true,
+    alwaysOnTop: true,
     resizable: false,
     movable: false,
     fullscreenable: false,
     autoHideMenuBar: true,
-    hasShadow: true
-    // skipTaskbar: true,
-    // icon: 'favicon.ico'
-    // show: false
+    hasShadow: true,
+    skipTaskbar: true,
+    vibrancy: "light", //macos
+    icon: path.join(__dirname, "../src/assets/logo.png"),
+    title: "ClipBoard",
+    titleBarStyle: "hidden",
+    show: false
   });
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
@@ -51,16 +56,17 @@ async function createWindow() {
     win.loadURL("app://./index.html");
   }
 
-  //为了让画面显示时没有视觉闪烁，
-  // win.once("ready-to-show", () => {
-  //   win.show();
-  // });
   initTray(app, win);
 
   win.on("close", function(e) {
     e.preventDefault();
     win.hide();
   });
+
+  //为了让画面显示时没有视觉闪烁，
+  // win.once("ready-to-show", () => {
+  //   win.show();
+  // });
 }
 
 // Quit when all windows are closed.
@@ -99,11 +105,20 @@ app.on("ready", async () => {
       if (win && !win.isVisible()) win.show();
       else if (!win) console.error("无窗口可获取。");
     });
+    globalShortcut.register("Esc", () => {
+      const win =
+        BrowserWindow.getAllWindows().length > 0
+          ? BrowserWindow.getAllWindows()[0]
+          : null;
+      if (!win) console.error("无窗口可获取。");
+      else win.hide();
+    });
   } catch (e) {
     console.error("注册快捷键失败:", e.toString());
   }
   createWindow();
 });
+
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === "win32") {

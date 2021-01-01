@@ -1,14 +1,23 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link>
-      |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view />
+    <title-bar v-if="false" />
+    <el-header>
+      <navigation />
+    </el-header>
+    <el-main>
+      <router-view />
+    </el-main>
   </div>
 </template>
+<script>
+import Navigation from "@/components/Navigation";
+import TitleBar from "@/components/TitleBar";
 
+export default {
+  name: "App",
+  components: { Navigation, TitleBar }
+};
+</script>
 <style>
 body,
 html {
@@ -31,13 +40,11 @@ html {
   background-color: rgba(255, 255, 255, 0.72);
   backdrop-filter: saturate(180%) blur(20px);
   /*filter: saturate(180%) blur(20px);*/
-  position: fixed;
   width: 100%;
-  height: 100%;
-  overflow: hidden;
+  position: fixed;
 }
 
-#nav {
-  padding: 30px;
+.el-main {
+  padding: 0 20px !important;
 }
 </style>
