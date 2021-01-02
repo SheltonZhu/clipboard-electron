@@ -69,7 +69,6 @@ export default function initTray(app, win) {
   const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
 
   // 用一个 Tray 来表示一个图标,这个图标处于正在运行的系统的通知区
-  // const iconPath = path.join(__dirname, "../src/assets/favicon.ico");
   const iconPath = path.join(__static, "icon.png");
 
   const appTray = new Tray(iconPath);

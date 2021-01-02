@@ -43,7 +43,6 @@ async function createWindow() {
     hasShadow: true,
     skipTaskbar: true,
     vibrancy: "light", //macos
-    // icon: path.join(__dirname, "../src/assets/favicon.ico"),
     icon: path.join(__static, "icon.png"),
     title: "ClipBoard",
     titleBarStyle: "hidden",
