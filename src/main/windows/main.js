@@ -47,9 +47,7 @@ export default async () => {
     titleBarStyle: "hidden",
     show: false
   };
-  if (isDevelopment) {
-    browserOptions.show = true;
-  }
+
   if (systemPreferences.isAeroGlassEnabled()) {
     browserOptions.transparent = true;
     browserOptions.frame = false;
@@ -80,10 +78,12 @@ export default async () => {
   win.on("hide", () => {
     globalShortcut.unregister("Esc");
   });
-  //为了让画面显示时没有视觉闪烁，
-  // win.once("ready-to-show", () => {
-  //   win.show();
-  // });
 
+  if (isDevelopment) {
+    //为了让画面显示时没有视觉闪烁，
+    win.once("ready-to-show", () => {
+      win.show();
+    });
+  }
   return win;
 };
