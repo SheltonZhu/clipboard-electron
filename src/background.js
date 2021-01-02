@@ -1,77 +1,17 @@
 "use strict";
-/* global __static */
-import { globalShortcut, screen, app, protocol, BrowserWindow } from "electron";
-import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
+import { app, protocol } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
-import { autoUpdater } from "electron-updater";
-import initTray from "@/tray";
-import path from "path";
+import initTray from "./main/tray";
+import initShortCut from "./main/shortcut";
+import WindowManager from "@/main/windows";
 
+let windowManager = new WindowManager();
 const isDevelopment = process.env.NODE_ENV !== "production";
+
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-
-async function createWindow() {
-  // Create the browser window.
-  const display = screen.getPrimaryDisplay().workAreaSize; //1440,2560
-  const winWidth = display.width;
-  const winHeight = Math.floor(display.height / 3);
-  const offsetY = winHeight * 2;
-  const win = new BrowserWindow({
-    width: winWidth,
-    height: winHeight,
-    x: 0,
-    y: offsetY,
-    frame: false,
-    transparent: true,
-    // backgroundColor: "#ffffff00",
-    webPreferences: {
-      // Use pluginOptions.nodeIntegration, leave this alone
-      // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      experimentalFeatures: true,
-      enableRemoteModule: true,
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      preload: path.join(__dirname, "preload.js")
-    },
-    alwaysOnTop: true,
-    resizable: false,
-    movable: false,
-    fullscreenable: false,
-    autoHideMenuBar: true,
-    hasShadow: true,
-    skipTaskbar: true,
-    vibrancy: "light", //macos
-    icon: path.join(__static, "icon.png"),
-    title: "ClipBoard",
-    titleBarStyle: "hidden",
-    show: false
-  });
-
-  if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
-    await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL);
-    if (!process.env.IS_TEST) win.webContents.openDevTools();
-  } else {
-    createProtocol("app");
-    // Load the index.html when not in development
-    win.loadURL("app://./index.html");
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-
-  initTray(app, win);
-
-  win.on("close", function(e) {
-    e.preventDefault();
-    win.hide();
-  });
-
-  //为了让画面显示时没有视觉闪烁，
-  // win.once("ready-to-show", () => {
-  //   win.show();
-  // });
-}
 
 // Quit when all windows are closed.
 app.on("window-all-closed", () => {
@@ -85,7 +25,7 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) createWindow();
+  if (windowManager.hasWindows()) windowManager.initMainWindow();
 });
 
 // This method will be called when Electron has finished
@@ -100,27 +40,10 @@ app.on("ready", async () => {
       console.error("Vue Devtools failed to install:", e.toString());
     }
   }
-  try {
-    globalShortcut.register("Alt+V", () => {
-      const win =
-        BrowserWindow.getAllWindows().length > 0
-          ? BrowserWindow.getAllWindows()[0]
-          : null;
-      if (win && !win.isVisible()) win.show();
-      else if (!win) console.error("无窗口可获取。");
-    });
-    globalShortcut.register("Esc", () => {
-      const win =
-        BrowserWindow.getAllWindows().length > 0
-          ? BrowserWindow.getAllWindows()[0]
-          : null;
-      if (!win) console.error("无窗口可获取。");
-      else win.hide();
-    });
-  } catch (e) {
-    console.error("注册快捷键失败:", e.toString());
-  }
-  createWindow();
+  let win = await windowManager.initMainWindow();
+  windowManager.setMainWindow(win);
+  initTray();
+  initShortCut();
 });
 
 // Exit cleanly on request from parent process in development mode.

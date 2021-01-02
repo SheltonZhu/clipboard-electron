@@ -54,9 +54,8 @@ export default {
       this.pasteAndHide();
     },
     pasteAndHide() {
-      // this.$electron.remote.clipboard.writeText('Example String')
       // console.log(this.$electron.remote.clipboard.readText('selection'))
-      // this.write2clipboard(e.target.toString());
+      this.write2clipboard("写入剪贴板");
       this.$electron.remote.getCurrentWindow().hide();
     },
     write2clipboard(src) {

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Spot from "@/components/Spot";
+import Spot from "@/renderer/components/Spot";
 
 export default {
   name: "Navigation",

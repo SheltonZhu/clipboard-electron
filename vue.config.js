@@ -1,16 +1,7 @@
 const env = process.env.NODE_ENV === "development" ? "test" : "";
 module.exports = {
-  configureWebpack: {
-    // Webpack configuration applied to web builds and the electron renderer process
-  },
   pluginOptions: {
     electronBuilder: {
-      // chainWebpackMainProcess: (config) => {
-      //   Chain webpack config for electron main process only
-      // },
-      // chainWebpackRendererProcess: (config) => {
-      // Chain webpack config for electron renderer process only (won't be applied to web builds)
-      // },
       nodeIntegration: true,
       // outputDir: 'electron-builder-output-dir'  // Changing the Output Directory
       preload: "src/preload.js",
@@ -24,14 +15,13 @@ module.exports = {
         //   }
         // ],
         // asar: false, // 是否使用 asar 壓縮檔案
-        appId: "your.id" + env, // 認證的 appId
-        productName: "productName" + env, // 專案名稱
+        // appId: "myappid.id" + env, // 認證的 appId
+        productName: "clipboard" + env,
         // artifactName: '${name}.${ext}', // 檔案名稱樣板，有 ESLint 記得關掉
-        copyright: "Copyright©ares", // 版權
-        // Windows 相關設定
+        copyright: "Copyright©SheltonZhu",
         win: {
-          legalTrademarks: "legalTrademarks", // 商標
-          icon: "public/icon.ico", // 安裝檔圖示
+          legalTrademarks: "clipboard-electron", // 商标
+          icon: "build/icons/icon.ico",
           target: [
             {
               target: "nsis", // 檔案類型
@@ -39,27 +29,24 @@ module.exports = {
             }
           ]
         },
-        // DMG 相關設定
         dmg: {
-          icon: "public/icon.icns" // 安裝檔圖示
+          icon: "build/icons/icon.icns"
         },
-        // Linux 相關設定
         linux: {
-          icon: "public/icon.png" // 安裝檔圖示
+          icon: "build/icons/icon.png"
         },
-        // macOS 相關設定
         mac: {
-          icon: "public/icon.icns" // 安裝檔圖示
+          icon: "build/icons/icon.icns"
         },
         nsis: {
-          oneClick: false, // 是否一鍵安裝
+          oneClick: false, // 一键安装
           perMachine: true, // 是否為每一台機器安裝
-          installerIcon: "public/icon.ico", // 安裝圖示
-          uninstallerIcon: "public/icon.ico", // 卸載圖示
-          installerHeaderIcon: "public/icon.ico", // 安裝頂部圖示
-          allowToChangeInstallationDirectory: true, // 是否可更改安裝目錄
-          createDesktopShortcut: true, // 是否建立桌面捷徑
-          createStartMenuShortcut: true // 是否建立開始捷徑
+          installerIcon: "build/icons/icon.ico",
+          uninstallerIcon: "build/icons/icon.ico",
+          installerHeaderIcon: "build/icons/icon.ico",
+          allowToChangeInstallationDirectory: true,
+          createDesktopShortcut: true,
+          createStartMenuShortcut: true
         }
       }
     }

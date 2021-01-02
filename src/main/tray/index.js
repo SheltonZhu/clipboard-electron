@@ -1,10 +1,12 @@
 /* global __static */
-
-import { Menu, Tray, dialog } from "electron";
+import { app, Menu, Tray, dialog } from "electron";
 import path from "path";
-import pkg from "../../package.json";
+import windowManager from "../windows";
+import pkg from "../../../package.json";
 
-export default function initTray(app, win) {
+export default () => {
+  let mainWin = new windowManager().mainWindowSafe;
+
   // 系统托盘右键菜单
   const trayMenuTemplate = [
     {
@@ -13,10 +15,6 @@ export default function initTray(app, win) {
       submenu: [
         {
           label: "其他1",
-          type: "radio"
-        },
-        {
-          label: "其他2",
           type: "radio"
         }
       ]
@@ -65,20 +63,16 @@ export default function initTray(app, win) {
       }
     }
   ];
-  // 图标的上下文菜单
   const contextMenu = Menu.buildFromTemplate(trayMenuTemplate);
-
-  // 用一个 Tray 来表示一个图标,这个图标处于正在运行的系统的通知区
-  const iconPath = path.join(__static, "icon.png");
-
-  const appTray = new Tray(iconPath);
-  // 设置托盘悬浮提示
-  appTray.setToolTip("Electron Clipboard");
+  const appIcon = path.join(__static, "icon.png");
+  const appTray = new Tray(appIcon);
   // 设置托盘菜单
   appTray.setContextMenu(contextMenu);
+  // 设置托盘悬浮提示
+  appTray.setToolTip("Electron Clipboard");
   appTray.on("click", () => {
-    if (!win.isVisible()) win.show();
-    else win.hide();
+    if (mainWin.isVisible()) mainWin.hide();
+    else mainWin.show();
   });
-  // return appTray;
-}
+  return appTray;
+};
