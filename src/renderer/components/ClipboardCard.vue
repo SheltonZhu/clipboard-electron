@@ -1,15 +1,7 @@
 <template>
   <el-card
-    @keyup.enter.native="
-      () => {
-        cardOnSelected(data.copyContent);
-      }
-    "
-    @dblclick.native="
-      () => {
-        cardOnDblClick(data.copyContent);
-      }
-    "
+    @keyup.enter.native="cardOnSelected"
+    @dblclick.native="cardOnDblClick"
     class="box-card"
     tabindex="100"
     @keyup.right.native="$event.target.nextElementSibling.focus()"
@@ -51,14 +43,14 @@ export default {
     hideWin() {
       this.$electron.remote.getCurrentWindow().hide();
     },
-    cardOnSelected(data) {
-      this.pasteAndHide(data);
+    cardOnSelected() {
+      this.pasteAndHide();
     },
-    cardOnDblClick(data) {
-      this.pasteAndHide(data);
+    cardOnDblClick() {
+      this.pasteAndHide();
     },
-    pasteAndHide(data) {
-      this.write2clipboard(data);
+    pasteAndHide() {
+      this.write2clipboard(this.data.copyContent);
       this.$electron.remote.getCurrentWindow().hide();
     },
     write2clipboard(data) {

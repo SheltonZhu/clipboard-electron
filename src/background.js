@@ -1,5 +1,5 @@
 "use strict";
-import { app, protocol } from "electron";
+import { app, protocol, ipcMain } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
 import uuid from "uuid";
@@ -10,6 +10,13 @@ import db from "./main/db";
 
 let windowManager = new WindowManager();
 const isDevelopment = process.env.NODE_ENV !== "production";
+
+const gotTheLock = app.requestSingleInstanceLock();
+
+//进程锁
+if (!gotTheLock) {
+  app.quit();
+}
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
@@ -38,7 +45,12 @@ clipboard
   })
   .startWatching();
 
-// Quit when all windows are closed.
+ipcMain.on("readyPush", event => {
+  let initData = db.getAllData("historyData");
+  initData = initData ? initData.reverse() : [];
+  event.sender.send("init-data", initData);
+});
+
 app
   .on("ready", async () => {
     if (isDevelopment && !process.env.IS_TEST) {
@@ -49,18 +61,12 @@ app
         console.error("Vue Devtools failed to install:", e.toString());
       }
     }
-    let win = await windowManager.initMainWindow();
-    windowManager.setMainWindow(win);
+    db.initMyDB();
+    windowManager.setMainWindow(await windowManager.initMainWindow());
     initTray();
     initShortCut();
-    await db.initMyDB();
-    let initData = db.getAllData("historyData");
-    if (initData) {
-      initData = initData.reverse();
-    } else {
-      initData = [];
-    }
-    win.webContents.send("init-data", initData);
+
+    // win.webContents.send("init-data", initData);
   })
   .on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
@@ -76,6 +82,7 @@ app
   })
   .on("quit", () => {
     clipboard.stopWatching();
+    if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
   });
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {

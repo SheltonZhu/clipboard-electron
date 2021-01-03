@@ -25,6 +25,7 @@ export default {
   },
   methods: {
     init() {
+      this.$electron.ipcRenderer.send("readyPush");
       this.$electron.ipcRenderer.on("init-data", (event, arg) => {
         this.clipboardData = arg;
       });

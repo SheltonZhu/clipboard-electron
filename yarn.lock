@@ -2119,6 +2119,11 @@ app-builder-lib@22.9.1:
     semver "^7.3.2"
     temp-file "^3.3.7"
 
+appdirectory@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.npm.taobao.org/appdirectory/download/appdirectory-0.1.0.tgz#eb6c816320e7b2ab16f5ed997f28d8205df56375"
+  integrity sha1-62yBYyDnsqsW9e2ZfyjYIF31Y3U=
+
 aproba@^1.1.1:
   version "1.2.0"
   resolved "https://registry.npm.taobao.org/aproba/download/aproba-1.2.0.tgz#6802e6264efd18c790a1b0d517f0f2627bf2c94a"
@@ -4130,6 +4135,11 @@ electron-icon-builder@^2.0.1:
     args "^5.0.1"
     icon-gen "^2.0.0"
     jimp "^0.16.1"
+
+electron-log@^4.3.1:
+  version "4.3.1"
+  resolved "https://registry.npm.taobao.org/electron-log/download/electron-log-4.3.1.tgz#1405fef9d4e6964a5fdb8790a69163aa237ffe91"
+  integrity sha1-FAX++dTmlkpf24eQppFjqiN//pE=
 
 electron-publish@22.9.1:
   version "22.9.1"

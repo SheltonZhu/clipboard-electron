@@ -1,10 +1,33 @@
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
+import AppDirectory from "appdirectory";
 import uuid from "uuid";
+import path from "path";
+import fs from "fs";
 import Cryptr from "../cryptr";
+import pkg from "../../../package.json";
+
+const isDevelopment = process.env.NODE_ENV !== "production";
+
+let dbPath = "db.json";
+if (!isDevelopment) {
+  let dirs = new AppDirectory({
+    appName: pkg.name,
+    appVersion: pkg.version
+  });
+  const mkdirsSync = dirname => {
+    if (fs.existsSync(dirname)) return true;
+    if (mkdirsSync(path.dirname(dirname))) {
+      fs.mkdirSync(dirname);
+      return true;
+    }
+  };
+  mkdirsSync(dirs.userCache());
+  dbPath = path.join(dirs.userCache(), dbPath);
+}
 
 const cryptr = new Cryptr("my secret key");
-const adapter = new FileSync("db.json", {
+const adapter = new FileSync(dbPath, {
   serialize: data => cryptr.encrypt(JSON.stringify(data)),
   deserialize: data => JSON.parse(cryptr.decrypt(data))
 });
@@ -46,7 +69,7 @@ db.deleteOneData = (table, data) => {
     .write();
 };
 // id, copyType, copyTime, copyContent, otherInfo
-db.initMyDB = async () => {
+db.initMyDB = () => {
   const dbStatus = db.getState();
   if (!dbStatus["count"] && !dbStatus["count"] > 0) {
     db.defaults({ historyData: [], user: {}, count: 0 }).write();
