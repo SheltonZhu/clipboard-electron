@@ -26,13 +26,22 @@ protocol.registerSchemesAsPrivileged([
 clipboard
   .on("text-changed", () => {
     let currentText = clipboard.readText();
+    // let isLink = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(
+    let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(
+      currentText.trim()
+    );
     let data = {
       id: uuid(),
-      copyType: "text",
+      copyType: "Text",
       copyTime: new Date(),
       copyContent: currentText,
       otherInfo: currentText.length
     };
+    if (isLink) {
+      data.copyType = "Link";
+      data.copyContent = data.copyContent.trim();
+      data.otherInfo = "";
+    }
     db.addOneData("historyData", data);
     windowManager.mainWindowSafe.webContents.send(
       "clipboard-text-changed",
@@ -41,15 +50,30 @@ clipboard
   })
   .on("image-changed", () => {
     let currentIMage = clipboard.readImage();
-    console.log(currentIMage.getSize());
+    let image = {
+      id: uuid(),
+      copyType: "Image",
+      copyTime: new Date(),
+      copyContent: currentIMage.toDataURL(),
+      otherInfo: currentIMage.getSize()
+    };
+    db.addOneData("historyData", image);
+    windowManager.mainWindowSafe.webContents.send(
+      "clipboard-image-changed",
+      image
+    );
   })
   .startWatching();
 
-ipcMain.on("readyPush", event => {
-  let initData = db.getAllData("historyData");
-  initData = initData ? initData.reverse() : [];
-  event.sender.send("init-data", initData);
-});
+ipcMain
+  .once("init", event => {
+    let initData = db.getAllData("historyData");
+    // event.sender.send("init-data", initData);
+    event.reply("init-data", initData || []);
+  })
+  .on("delete-one-data", async (event, args) => {
+    event.reply("one-deleted", db.deleteOneData(args.table, { id: args.id }));
+  });
 
 app
   .on("ready", async () => {

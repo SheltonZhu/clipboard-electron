@@ -1,35 +1,22 @@
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
-import AppDirectory from "appdirectory";
 import uuid from "uuid";
 import path from "path";
-import fs from "fs";
-import Cryptr from "../cryptr";
-import pkg from "../../../package.json";
+import Cryptor from "../cryptor";
+import config from "../config";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
 let dbPath = "db.json";
 if (!isDevelopment) {
-  let dirs = new AppDirectory({
-    appName: pkg.name,
-    appVersion: pkg.version
-  });
-  const mkdirsSync = dirname => {
-    if (fs.existsSync(dirname)) return true;
-    if (mkdirsSync(path.dirname(dirname))) {
-      fs.mkdirSync(dirname);
-      return true;
-    }
-  };
-  mkdirsSync(dirs.userCache());
-  dbPath = path.join(dirs.userCache(), dbPath);
+  let dataPath = config.get("dataPath");
+  dbPath = path.join(dataPath, dbPath);
 }
 
-const cryptr = new Cryptr("my secret key");
+const cryptor = new Cryptor.NoCryptor(config.get("dataEncodeKey"));
 const adapter = new FileSync(dbPath, {
-  serialize: data => cryptr.encrypt(JSON.stringify(data)),
-  deserialize: data => JSON.parse(cryptr.decrypt(data))
+  serialize: data => cryptor.encrypt(JSON.stringify(data)),
+  deserialize: data => JSON.parse(cryptor.decrypt(data))
 });
 const db = low(adapter);
 db.addOneData = (table, data) => {
@@ -42,21 +29,28 @@ db.addOneData = (table, data) => {
 };
 
 db.getAllData = table => {
-  return db.get(table).value();
+  return db
+    .get(table)
+    .sortBy("copyTime")
+    .value()
+    .reverse();
 };
 
-// db.removeData = (table) => {
-// db.get(table)
-//   .remove({ copyTime: 'low!' })
-//   .write();
-// TODO
-// };
+//待测试
+db.removeAllData = table => {
+  db.get(table)
+    .remove()
+    .write();
+};
+
+//待测试
 db.searchData = (table, copyContent) => {
   return db
     .get(table)
     .find({ copyContent: copyContent })
     .filter();
 };
+//待测试
 db.countData = table => {
   db.get(table)
     .size()
@@ -64,9 +58,12 @@ db.countData = table => {
 };
 
 db.deleteOneData = (table, data) => {
-  db.get(table)
-    .remove(data)
-    .write();
+  return (
+    db
+      .get(table)
+      .remove(data)
+      .write().length > 0
+  );
 };
 // id, copyType, copyTime, copyContent, otherInfo
 db.initMyDB = () => {
@@ -75,14 +72,13 @@ db.initMyDB = () => {
     db.defaults({ historyData: [], user: {}, count: 0 }).write();
     let initDate = {
       id: uuid(),
-      copyType: "text",
+      copyType: "Text",
       copyTime: new Date(),
-      copyContent: "Thank for you using!!!!",
-      otherInfo: 23
+      copyContent: config.get("initCopyContent"),
+      otherInfo: config.get("initCopyContent").length
     };
     db.addOneData("historyData", initDate);
   }
-  // Set a user using Lodash shorthand syntax
   db.set("user.name", "clipboard").write();
 };
 

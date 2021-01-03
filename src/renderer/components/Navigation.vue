@@ -16,11 +16,12 @@
           <spot color="#aaabab" />
           剪贴板历史
         </el-menu-item>
-        <el-menu-item index="/useful"
-          ><spot color="#ff625c" />
-          有用的链接
+        <el-menu-item index="/useful">
+          <spot color="#ff625c" />
+          实用链接
         </el-menu-item>
         <i class="el-menu-item el-icon-plus add-btn" tabindex="0"></i>
+        <i class="el-menu-item el-icon-more-outline more-btn" tabindex="0"></i>
       </el-menu>
     </div>
   </div>
@@ -74,21 +75,32 @@ export default {
   display: inline-block;
 }
 
-.el-menu-item.is-active {
+.el-menu-item:not(.add-btn):not(.search-btn):not(.more-btn):focus,
+.el-menu-item:not(.add-btn):not(.search-btn):not(.more-btn):hover {
   color: #fff !important;
-  border-bottom: none;
-  background: #b9b9b9d1;
-}
-
-.el-menu--horizontal .el-menu-item:not(.is-disabled):focus,
-.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {
-  color: #fff !important;
-  background: #b9b9b9d1;
+  background: #b9b9b9d1 !important;
 }
 
 .add-btn,
-.search-btn {
+.search-btn,
+.more-btn {
   border-radius: 50%;
   padding: 0 9px;
 }
+
+.add-btn:focus,
+.search-btn:focus,
+.more-btn:focus,
+.add-btn:hover,
+.search-btn:hover,
+.more-btn:hover {
+  color: #2c3e50 !important;
+  background: none !important;
+}
+
+/*.el-menu--horizontal .el-menu-item:not(.is-disabled):focus,*/
+/*.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {*/
+/*  color: #fff !important;*/
+/*  background: #b9b9b9d1 !important;*/
+/*}*/
 </style>

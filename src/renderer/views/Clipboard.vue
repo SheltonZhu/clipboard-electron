@@ -25,13 +25,17 @@ export default {
   },
   methods: {
     init() {
-      this.$electron.ipcRenderer.send("readyPush");
-      this.$electron.ipcRenderer.on("init-data", (event, arg) => {
+      this.clipboardData = this.$electron.ipcRenderer.send("init");
+      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
         this.clipboardData = arg;
       });
 
       this.$electron.ipcRenderer.on(
         "clipboard-text-changed",
+        this.insertOneData
+      );
+      this.$electron.ipcRenderer.on(
+        "clipboard-image-changed",
         this.insertOneData
       );
     },

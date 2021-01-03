@@ -1,11 +1,6 @@
 /* global __static */
 
-import {
-  BrowserWindow,
-  globalShortcut,
-  screen,
-  systemPreferences
-} from "electron";
+import { BrowserWindow, globalShortcut, screen } from "electron";
 import path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { autoUpdater } from "electron-updater";
@@ -32,6 +27,8 @@ export default async () => {
     x: 0,
     y: offsetY,
     backgroundColor: "#00000000",
+    transparent: true,
+    frame: false,
     alwaysOnTop: true,
     resizable: false,
     movable: false,
@@ -48,10 +45,6 @@ export default async () => {
     show: false
   };
 
-  if (systemPreferences.isAeroGlassEnabled()) {
-    browserOptions.transparent = true;
-    browserOptions.frame = false;
-  }
   const win = new BrowserWindow(browserOptions);
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
