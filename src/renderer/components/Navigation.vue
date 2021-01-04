@@ -1,45 +1,85 @@
 <template>
   <div class="nav">
-    <!--    <el-button class="el-icon-search search-btn" circle></el-button>-->
-    <!--    <router-link to="/">Clipboard History</router-link>-->
-    <!--    <router-link to="/">剪贴板历史</router-link>-->
-
     <div class="nav-content">
-      <el-menu
-        :default-active="activeIndex"
-        router="router"
-        class="el-menu-bar"
-        mode="horizontal"
+      <el-input
+        style="width: 500px;"
+        placeholder="请输入内容"
+        v-model="searchValue"
+        class="input-with-select"
+        @keyup.enter.native="doSearch"
       >
-        <i class="el-menu-item el-icon-search search-btn" tabindex="0"></i>
-        <el-menu-item index="/">
-          <spot color="#aaabab" />
-          剪贴板历史
-        </el-menu-item>
-        <el-menu-item index="/useful">
-          <spot color="#ff625c" />
-          实用链接
-        </el-menu-item>
-        <i class="el-menu-item el-icon-plus add-btn" tabindex="0"></i>
-        <i class="el-menu-item el-icon-more-outline more-btn" tabindex="0"></i>
-      </el-menu>
+        <el-select
+          style="width: 80px; "
+          v-model="selectType"
+          slot="prepend"
+          placeholder="请选择"
+        >
+          <el-option label="全部" value=""></el-option>
+          <el-option label="文本" value="Text"></el-option>
+          <el-option label="链接" value="Link"></el-option>
+          <el-option label="图片" value="Image"></el-option>
+        </el-select>
+        <el-button
+          slot="append"
+          icon="el-icon-search"
+          @click="doSearch"
+        ></el-button>
+      </el-input>
+      <!--      <el-menu-->
+      <!--        :default-active="activeIndex"-->
+      <!--        class="el-menu-bar"-->
+      <!--        mode="horizontal"-->
+      <!--      >-->
+      <!--        <i class="el-menu-item el-icon-search search-btn" tabindex="0"></i>-->
+      <!--        <el-menu-item index="/">-->
+      <!--          <spot color="#aaabab" />-->
+      <!--          剪贴板历史-->
+      <!--        </el-menu-item>-->
+      <!--        <el-menu-item index="/useful">-->
+      <!--          <spot color="#ff625c" />-->
+      <!--          实用链接-->
+      <!--        </el-menu-item>-->
+      <!--        <i class="el-menu-item el-icon-plus add-btn" tabindex="0"></i>-->
+      <!--        <i class="el-menu-item el-icon-more-outline more-btn" tabindex="0"></i>-->
+      <!--      </el-menu>-->
     </div>
   </div>
 </template>
 
 <script>
-import Spot from "@/renderer/components/Spot";
+// import Spot from "@/renderer/components/Spot";
+
+import { mapState } from "vuex";
 
 export default {
   name: "Navigation",
-  components: { Spot },
-  comments: {
-    Spot
-  },
+  // components: { Spot },
   data: () => {
     return {
-      activeIndex: "/"
+      activeIndex: "/",
+      searchValue: "",
+      selectType: ""
     };
+  },
+  computed: mapState(["clipboardData", "query", "table", "searchType"]),
+  methods: {
+    doSearch() {
+      if (
+        this.query !== this.searchValue.trim() ||
+        this.selectType !== this.searchType
+      ) {
+        this.$store.commit("updateQuery", this.searchValue.trim());
+        this.$store.commit("updateSearchType", this.selectType);
+        this.$electron.ipcRenderer.send("init", {
+          table: this.table,
+          query: this.query,
+          selectType: this.searchType
+        });
+        this.$electron.ipcRenderer.once("init-data", (event, args) => {
+          this.$store.commit("updateClipboardData", args);
+        });
+      }
+    }
   }
 };
 </script>

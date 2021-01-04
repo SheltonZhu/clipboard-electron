@@ -1,5 +1,6 @@
 import { globalShortcut } from "electron";
-import windowManager from "../windows";
+import windowManager from "@/main/windows";
+
 export default () => {
   let mainWin = new windowManager().mainWindowSafe;
 

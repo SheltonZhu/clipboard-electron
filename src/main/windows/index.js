@@ -1,5 +1,5 @@
-import initMainWindow from "./main";
-import settings from "./settings";
+import initMainWindow from "@/main/windows/main";
+import settings from "@/main/windows/settings";
 import { BrowserWindow } from "electron";
 
 export default class WindowManager {

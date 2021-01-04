@@ -4,8 +4,23 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
+  state: {
+    clipboardData: [],
+    query: "",
+    table: "historyData",
+    searchType: ""
+  },
+  mutations: {
+    updateQuery(state, query) {
+      state.query = query;
+    },
+    updateClipboardData(state, clipboardData) {
+      state.clipboardData = clipboardData;
+    },
+    updateSearchType(state, searchType) {
+      state.searchType = searchType;
+    }
+  },
   actions: {},
   modules: {}
 });

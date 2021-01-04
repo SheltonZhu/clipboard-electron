@@ -4,18 +4,30 @@
       v-for="(data, idx) in clipboardData"
       :key="idx"
       :data="data"
+      :table="table"
     />
   </div>
 </template>
 <script>
 import ClipboardCard from "@/renderer/components/ClipboardCard";
+import { mapState } from "vuex";
 
 export default {
+  props: {
+    table: {
+      type: String,
+      default: "historyData"
+    },
+    clipboardData: {
+      type: Array,
+      default: () => []
+    }
+  },
   name: "Clipboard",
   components: { ClipboardCard },
   data: () => {
     return {
-      clipboardData: []
+      // clipboardData: []
     };
   },
   mounted() {
@@ -23,13 +35,10 @@ export default {
       this.init();
     });
   },
+  computed: mapState(["searchType"]),
   methods: {
     init() {
-      this.clipboardData = this.$electron.ipcRenderer.send("init");
-      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
-        this.clipboardData = arg;
-      });
-
+      // this.initData();
       this.$electron.ipcRenderer.on(
         "clipboard-text-changed",
         this.insertOneData
@@ -39,12 +48,25 @@ export default {
         this.insertOneData
       );
     },
+    initData() {
+      this.$electron.ipcRenderer.send("init", {
+        table: this.table,
+        query: this.query
+      });
+      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
+        this.clipboardData = arg;
+      });
+    },
     onMouseWheel(e) {
       e.preventDefault();
       this.$refs.clipboard.scrollLeft += parseInt(e.deltaY);
     },
     insertOneData(event, arg) {
-      this.clipboardData.unshift(arg);
+      if (
+        this.table === "historyData" &&
+        (!this.searchType || this.searchType === arg.copyType)
+      )
+        this.clipboardData.unshift(arg);
     }
   }
 };

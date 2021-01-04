@@ -3,13 +3,15 @@ import { app, protocol, ipcMain } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
 import uuid from "uuid";
-import initTray from "./main/tray";
-import initShortCut from "./main/shortcut";
-import WindowManager from "./main/windows";
-import db from "./main/db";
+import initTray from "@/main/tray";
+import initShortCut from "@/main/shortcut";
+import WindowManager from "@/main/windows";
+import db from "@/main/db";
+import config from "@/main/config";
+import log from "@/main/log";
 
 let windowManager = new WindowManager();
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment = config.get("isDevelopment");
 
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -66,9 +68,10 @@ clipboard
   .startWatching();
 
 ipcMain
-  .once("init", event => {
-    let initData = db.getAllData("historyData");
+  .on("init", (event, args) => {
+    let initData = db.getAllData(args.table, args.query, args.selectType);
     // event.sender.send("init-data", initData);
+    log.info("query", args);
     event.reply("init-data", initData || []);
   })
   .on("delete-one-data", async (event, args) => {

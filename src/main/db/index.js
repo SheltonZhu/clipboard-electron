@@ -2,10 +2,10 @@ import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
 import uuid from "uuid";
 import path from "path";
-import Cryptor from "../cryptor";
-import config from "../config";
+import Cryptor from "@/main/cryptor";
+import config from "@/main/config";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment = config.get("isDevelopment");
 
 let dbPath = "db.json";
 if (!isDevelopment) {
@@ -28,12 +28,34 @@ db.addOneData = (table, data) => {
   db.update("count", n => n + 1).write();
 };
 
-db.getAllData = table => {
-  return db
-    .get(table)
-    .sortBy("copyTime")
-    .value()
-    .reverse();
+db.getAllData = (table, query, copyType) => {
+  let found;
+  if (copyType) {
+    found = db
+      .get(table)
+      .filter({ copyType: copyType })
+      .sortBy("copyTime")
+      .value()
+      .reverse();
+  } else {
+    found = db
+      .get(table)
+      .sortBy("copyTime")
+      .value()
+      .reverse();
+  }
+  if (query.trim()) {
+    let retData = [];
+    if (copyType !== "Image") {
+      for (let data of found) {
+        if (data.copyType !== "Image" && data.copyContent.indexOf(query) >= 0) {
+          retData.push(data);
+        }
+      }
+      return retData;
+    }
+  }
+  return found;
 };
 
 //待测试

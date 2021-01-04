@@ -44,6 +44,10 @@ export default {
     data: {
       type: Object,
       default: null
+    },
+    table: {
+      type: String,
+      default: ""
     }
   },
   computed: {
@@ -98,7 +102,7 @@ export default {
     },
     deleteOneData() {
       this.$electron.ipcRenderer.send("delete-one-data", {
-        table: "historyData",
+        table: this.table,
         id: this.data.id
       });
       this.$electron.ipcRenderer.once("one-deleted", (event, args) => {
@@ -114,6 +118,7 @@ export default {
     dataURLtoBlob(dataUrl) {
       let arr = dataUrl.split(",");
       let mime = arr[0].match(/:(.*?);/)[1];
+      console.log(mime);
       let bstr = atob(arr[1]);
       let n = bstr.length;
       let u8arr = new Uint8Array(n);
@@ -124,11 +129,12 @@ export default {
     },
     contextMenuSaveImage() {
       let blob = this.dataURLtoBlob(this.data.copyContent);
+      let type = blob.type.split("/")[1];
       let reader = new FileReader();
       reader.readAsDataURL(blob);
       reader.onload = e => {
         let link = document.createElement("a");
-        link.download = `${this.data.id}.png`;
+        link.download = `${this.data.id}.${type}`;
         link.href = e.target.result;
         link.style.display = "none";
         document.body.appendChild(link);

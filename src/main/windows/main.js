@@ -1,11 +1,13 @@
 /* global __static */
 
 import { BrowserWindow, globalShortcut, screen } from "electron";
-import path from "path";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import { autoUpdater } from "electron-updater";
+import config from "@/main/config";
+import log from "@/main/log";
+import path from "path";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment = config.get("isDevelopment");
 
 export default async () => {
   // Create the browser window.
@@ -74,6 +76,7 @@ export default async () => {
 
   if (isDevelopment) {
     //为了让画面显示时没有视觉闪烁，
+    log.info("mode: dev");
     win.once("ready-to-show", () => {
       win.show();
     });

@@ -1,8 +1,8 @@
 /* global __static */
 import { app, Menu, Tray, dialog } from "electron";
 import path from "path";
-import windowManager from "../windows";
-import pkg from "../../../package.json";
+import windowManager from "@/main/windows";
+import pkg from "@/../package.json";
 
 export default () => {
   let mainWin = new windowManager().mainWindowSafe;

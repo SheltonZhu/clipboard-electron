@@ -5,6 +5,8 @@ import path from "path";
 
 const isDevelopment = process.env.NODE_ENV !== "production";
 
+config.set("isDevelopment", isDevelopment);
+
 let dirs = new AppDirectory({
   appName: "Clipboard",
   useRoaming: true

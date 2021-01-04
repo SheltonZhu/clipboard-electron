@@ -1,21 +1,66 @@
 <template>
   <div id="app">
-    <title-bar v-if="false" />
+    <title-bar :table="table" v-if="false" />
     <el-header>
       <navigation />
     </el-header>
     <el-main>
-      <router-view />
+      <clipboard :table="table" :clipboardData="this.clipboardData" />
     </el-main>
   </div>
 </template>
 <script>
 import Navigation from "@/renderer/components/Navigation";
 import TitleBar from "@/renderer/components/TitleBar";
+import Clipboard from "@/renderer/views/Clipboard";
+import { mapState } from "vuex";
 
 export default {
   name: "App",
-  components: { Navigation, TitleBar }
+  components: { Navigation, TitleBar, Clipboard },
+  mounted() {
+    this.$nextTick(() => {
+      this.init();
+    });
+  },
+  computed: mapState(["clipboardData", "query", "table"]),
+  data: () => {
+    return {
+      // table: "historyData",
+      // query: "",
+      // clipboardData: []
+    };
+  },
+  methods: {
+    initData() {
+      this.$electron.ipcRenderer.send("init", {
+        table: this.table,
+        query: this.query
+      });
+      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
+        this.$store.commit("updateClipboardData", arg);
+      });
+    },
+    init() {
+      this.initData();
+      let holder = document.getElementById("app");
+      holder.ondragover = this.returnFalse;
+      holder.ondragleave = this.returnFalse;
+      holder.ondragend = this.returnFalse;
+      holder.ondrop = this.onDrop;
+    },
+    onDrop(e) {
+      e.preventDefault();
+      for (let f of e.dataTransfer.files) {
+        console.log("File(s) you dragged here: ", f.path);
+        console.log(f.name, f.type, f.size);
+      }
+      return false;
+    },
+    returnFalse() {
+      return false;
+    }
+  }
 };
 </script>
 <style>
@@ -48,6 +93,7 @@ html {
   padding: 0 20px !important;
   height: 410px;
 }
+
 .el-header {
   height: unset !important;
 }
