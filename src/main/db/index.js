@@ -60,18 +60,11 @@ db.getAllData = (table, query, copyType) => {
 
 //待测试
 db.removeAllData = table => {
-  db.get(table)
-    .remove()
-    .write();
+  delete db[table];
+  db.save();
+  return db.set(table, []).write();
 };
 
-//待测试
-db.searchData = (table, copyContent) => {
-  return db
-    .get(table)
-    .find({ copyContent: copyContent })
-    .filter();
-};
 //待测试
 db.countData = table => {
   db.get(table)

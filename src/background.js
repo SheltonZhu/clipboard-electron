@@ -70,7 +70,6 @@ clipboard
 ipcMain
   .on("init", (event, args) => {
     let initData = db.getAllData(args.table, args.query, args.selectType);
-    // event.sender.send("init-data", initData);
     log.info("query", args);
     event.reply("init-data", initData || []);
   })

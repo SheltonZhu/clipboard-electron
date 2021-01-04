@@ -2,8 +2,9 @@
   <div class="nav">
     <div class="nav-content">
       <el-input
-        style="width: 500px;"
+        ref="searchBar"
         placeholder="请输入内容"
+        size="small"
         v-model="searchValue"
         class="input-with-select"
         @keyup.enter.native="doSearch"
@@ -25,41 +26,47 @@
           @click="doSearch"
         ></el-button>
       </el-input>
-      <!--      <el-menu-->
-      <!--        :default-active="activeIndex"-->
-      <!--        class="el-menu-bar"-->
-      <!--        mode="horizontal"-->
-      <!--      >-->
-      <!--        <i class="el-menu-item el-icon-search search-btn" tabindex="0"></i>-->
-      <!--        <el-menu-item index="/">-->
-      <!--          <spot color="#aaabab" />-->
-      <!--          剪贴板历史-->
-      <!--        </el-menu-item>-->
-      <!--        <el-menu-item index="/useful">-->
-      <!--          <spot color="#ff625c" />-->
-      <!--          实用链接-->
-      <!--        </el-menu-item>-->
-      <!--        <i class="el-menu-item el-icon-plus add-btn" tabindex="0"></i>-->
-      <!--        <i class="el-menu-item el-icon-more-outline more-btn" tabindex="0"></i>-->
-      <!--      </el-menu>-->
+      <div class="clipboard-tag">
+        <el-button :class="{ 'is-selected': this.table === 'historyData' }">
+          <spot color="#aaabab" />
+          剪贴板历史
+        </el-button>
+        <el-button>
+          <spot color="#ff625c" />
+          实用链接
+        </el-button>
+      </div>
+      <el-button class="el-icon-plus add-btn"></el-button>
+      <el-button
+        @click="more"
+        class="el-icon-more-outline more-btn"
+      ></el-button>
     </div>
   </div>
 </template>
 
 <script>
-// import Spot from "@/renderer/components/Spot";
+import Spot from "@/renderer/components/Spot";
 
 import { mapState } from "vuex";
 
 export default {
   name: "Navigation",
-  // components: { Spot },
+  components: { Spot },
   data: () => {
     return {
       activeIndex: "/",
       searchValue: "",
-      selectType: ""
+      selectType: "",
+      isSearching: false
     };
+  },
+  mounted() {
+    /* document
+       .getElementsByClassName("input-with-select")
+       .addEventListener("blur", e => {
+         console.log(e.toString());
+       });*/
   },
   computed: mapState(["clipboardData", "query", "table", "searchType"]),
   methods: {
@@ -79,45 +86,57 @@ export default {
           this.$store.commit("updateClipboardData", args);
         });
       }
+    },
+    more() {
+      this.$confirm("清空剪贴板历史?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      }).then(() => {
+        this.$store.commit("updateClipboardData", []);
+        this.$message({
+          message: "已删除！",
+          type: "success"
+        });
+      });
     }
   }
 };
 </script>
 
 <style scoped>
-.el-menu {
-  background: #00000000;
-  border-bottom: none !important;
+.nav {
+  margin: 15px 0;
 }
 
-.nav {
-  margin: 20px 0;
+.nav .clipboard-tag {
+  display: inline-flex;
 }
 
 .nav .el-button {
+  color: #2c3e50;
   background: #ffffff00;
   border: 1px solid #ffffff00;
+  font-weight: bold !important;
+  padding: 8px 10px !important;
 }
 
-.el-menu-bar {
-  white-space: nowrap;
+.input-with-select {
+  width: 350px;
+  margin: 0 35px;
 }
 
-.el-menu-item {
-  margin: 0 20px !important;
-  color: #2c3e50 !important;
-  border-radius: 5px;
-  border-bottom: none !important;
-  height: 30px !important;
-  line-height: 30px !important;
-  font-weight: bold;
-  float: none !important;
-  display: inline-block;
+.clipboard-tag .el-button {
+  margin: 0 5px;
 }
 
-.el-menu-item:not(.add-btn):not(.search-btn):not(.more-btn):focus,
-.el-menu-item:not(.add-btn):not(.search-btn):not(.more-btn):hover {
-  color: #fff !important;
+.clipboard-tag .el-button:hover {
+  color: #fff;
+  background: #b9b9b9d1 !important;
+}
+
+.clipboard-tag .is-selected {
+  color: #fff;
   background: #b9b9b9d1 !important;
 }
 
@@ -128,19 +147,31 @@ export default {
   padding: 0 9px;
 }
 
-.add-btn:focus,
-.search-btn:focus,
-.more-btn:focus,
-.add-btn:hover,
-.search-btn:hover,
-.more-btn:hover {
-  color: #2c3e50 !important;
-  background: none !important;
+.more-btn {
+  float: right;
 }
 
-/*.el-menu--horizontal .el-menu-item:not(.is-disabled):focus,*/
-/*.el-menu--horizontal .el-menu-item:not(.is-disabled):hover {*/
-/*  color: #fff !important;*/
-/*  background: #b9b9b9d1 !important;*/
-/*}*/
+.el-select-dropdown__item.selected,
+.el-select-dropdown__item.hover,
+.el-select-dropdown__item:hover {
+  background-color: #b9b9b9d1;
+  color: #fff;
+}
+</style>
+<style>
+/*.el-input-group__append,*/
+/*.el-input--suffix,*/
+.el-select-dropdown {
+  background-color: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: saturate(180%) blur(5px) !important;
+}
+
+.input-with-select > .el-input__inner {
+  background-color: rgba(255, 255, 255, 0.72);
+}
+
+.el-message--success {
+  background-color: #f0f9ebbf !important;
+  backdrop-filter: saturate(180%) blur(5px) !important;
+}
 </style>
