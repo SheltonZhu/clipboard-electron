@@ -38,6 +38,8 @@
   </el-card>
 </template>
 <script>
+import { mapState } from "vuex";
+
 export default {
   name: "ClipboardCard",
   props: {
@@ -51,6 +53,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(["labelsData"]),
     isText() {
       return this.data.copyType === "Text";
     },
@@ -113,7 +116,7 @@ export default {
       this.copyAndHide();
     },
     share2email() {
-      this.execShellOpenLink("mailto:xyz@abc.com?subject=MySubject&body=");
+      this.execShellOpenLink("mailto: somebody@somewhere.io");
       this.copyAndHide();
     },
     execShellOpenLink(link) {
@@ -157,6 +160,21 @@ export default {
         document.body.removeChild(link);
       };
     },
+    add2favorite(_id) {
+      const newData = {};
+      newData.table = _id;
+      newData.copyType = this.data.copyType;
+      newData.copyTime = this.data.copyTime;
+      newData.copyContent = this.data.copyContent;
+      newData.otherInfo = this.data.otherInfo;
+
+      this.$electron.remote
+        .getGlobal("db")
+        .create(newData)
+        .then(ret => {
+          console.log(ret);
+        });
+    },
     //生成右键菜单
     onContextmenu(event) {
       let items = [];
@@ -189,6 +207,22 @@ export default {
       items.push({
         label: "快速查看（TODO）",
         icon: "el-icon-view"
+      });
+      let children = [];
+      for (let label of this.labelsData) {
+        if (label._id !== this.table) {
+          children.push({
+            label: label.name,
+            onClick: () => {
+              this.add2favorite(label._id);
+            }
+          });
+        }
+      }
+      items.push({
+        label: "添加到收藏",
+        icon: "el-icon-star-off",
+        children: children
       });
       items.push({
         label: "分享",

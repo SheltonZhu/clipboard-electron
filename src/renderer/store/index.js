@@ -8,7 +8,8 @@ export default new Vuex.Store({
     clipboardData: [],
     query: "",
     table: "historyData",
-    searchType: ""
+    searchType: "",
+    labelsData: []
   },
   mutations: {
     updateQuery(state, query) {
@@ -22,6 +23,9 @@ export default new Vuex.Store({
     },
     updateTable(state, tableName) {
       state.table = tableName;
+    },
+    updateLabelsData(state, labelsData) {
+      state.labelsData = labelsData;
     }
   },
   actions: {},

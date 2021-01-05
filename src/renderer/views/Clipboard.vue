@@ -69,7 +69,7 @@ export default {
           } else {
             if (
               (!this.searchType || this.searchType === data.copyType) &&
-              data.copyContent.indexOf(this.query) >= 0
+              new RegExp(this.query, "i").test(data.copyContent)
             )
               this.clipboardData.unshift(data);
           }

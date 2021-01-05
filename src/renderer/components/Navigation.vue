@@ -148,6 +148,7 @@ export default {
         .readAll()
         .then(ret => {
           this.labels = ret;
+          this.$store.commit("updateLabelsData", this.labels);
         });
     },
     clickLabelAdder() {
@@ -157,7 +158,7 @@ export default {
       });
     },
     doAddLabel() {
-      if (!this.newLabelValue.trim()) {
+      if (!this.newLabelValue.trim() || this.newLabelValue === "未命名") {
         this.newLabelValue = "未命名";
         this.newLabelVisible = false;
       } else {
@@ -171,6 +172,7 @@ export default {
             this.labels.push(ret);
             this.newLabelVisible = false;
             window.log.info(`[renderer]: addOneLabel: ${JSON.stringify(ret)}.`);
+            this.$store.commit("updateLabelsData", this.labels);
           });
       }
     },
@@ -207,7 +209,8 @@ export default {
           this.$store.commit("updateClipboardData", []);
           this.$message({
             message: `${numRemoved} 条已删除！`,
-            type: "success"
+            type: "success",
+            duration: 1000
           });
         })
         .catch(() => {})

@@ -65,18 +65,41 @@ export default {
         this.$store.commit("updateTable", this.labelData._id);
     },
     removeLabel() {
-      const _id = this.labelData._id;
-      this.$electron.remote
-        .getGlobal("labelDb")
-        .removeLabelAndData(_id)
-        .then(numRemoved => {
-          window.log.info(`[renderer]: ${numRemoved} removed.`);
-          let dataArray = this.$parent.labels;
-          let position = dataArray.indexOf(this.labelData);
-          this.$parent.labels.splice(position, 1);
-          if (this.isSelected) {
-            this.$store.commit("updateTable", "historyData");
-          }
+      this.$electron.remote.globalShortcut.unregister("Esc");
+      this.$confirm(
+        `确定删除【${this.labelData.name}】?删除的记录不可恢复！`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          const _id = this.labelData._id;
+          this.$electron.remote
+            .getGlobal("labelDb")
+            .removeLabelAndData(_id)
+            .then(numRemoved => {
+              window.log.info(`[renderer]: ${numRemoved} removed.`);
+              let dataArray = this.$parent.labels;
+              let position = dataArray.indexOf(this.labelData);
+              this.$parent.labels.splice(position, 1);
+              this.$store.commit("updateLabelsData", this.$parent.labels);
+              if (this.isSelected) {
+                this.$store.commit("updateTable", "historyData");
+              }
+            });
+          this.$message({
+            type: "success",
+            message: "删除成功!"
+          });
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$electron.remote.globalShortcut.register("Esc", () => {
+            this.$electron.remote.getCurrentWindow().hide();
+          });
         });
     },
     onRenameLabel() {
