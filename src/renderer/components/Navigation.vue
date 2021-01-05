@@ -61,41 +61,42 @@ export default {
       isSearching: false
     };
   },
-  mounted() {
-    /* document
-       .getElementsByClassName("input-with-select")
-       .addEventListener("blur", e => {
-         console.log(e.toString());
-       });*/
+  mounted() {},
+  watch: {
+    selectType() {
+      this.changeType();
+    }
   },
   computed: mapState(["clipboardData", "query", "table", "searchType"]),
   methods: {
     doSearch() {
-      if (
-        this.query !== this.searchValue.trim() ||
-        this.selectType !== this.searchType
-      ) {
-        this.$store.commit("updateQuery", this.searchValue.trim());
-        this.$store.commit("updateSearchType", this.selectType);
-        this.$electron.ipcRenderer.send("init", {
-          table: this.table,
-          query: this.query,
-          selectType: this.searchType
+      this.execSearch();
+    },
+    changeType() {
+      this.execSearch();
+    },
+    execSearch() {
+      this.$store.commit("updateQuery", this.searchValue.trim());
+      this.$store.commit("updateSearchType", this.selectType);
+      this.$electron.remote
+        .getGlobal("db")
+        .readAll(this.table, this.query, this.searchType)
+        .then(ret => {
+          this.$store.commit("updateClipboardData", ret);
         });
-        this.$electron.ipcRenderer.once("init-data", (event, args) => {
-          this.$store.commit("updateClipboardData", args);
-        });
-      }
     },
     more() {
       this.$confirm("清空剪贴板历史?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
-      }).then(() => {
+      }).then(async () => {
+        const numRemoved = await this.$electron.remote
+          .getGlobal("db")
+          .removeAll(this.table);
         this.$store.commit("updateClipboardData", []);
         this.$message({
-          message: "已删除！",
+          message: `${numRemoved} 条已删除！`,
           type: "success"
         });
       });

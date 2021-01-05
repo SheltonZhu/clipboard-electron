@@ -62,7 +62,7 @@ export default {
     },
     formattedOtherInfo() {
       if (this.isText) {
-        return `${this.data.otherInfo} 个字符`;
+        return `${this.data.otherInfo.characterLength} 个字符`;
       } else if (this.isImage) {
         return `${this.data.otherInfo.width} ✖ ${this.data.otherInfo.height} 个像素`;
       }
@@ -101,24 +101,20 @@ export default {
       this.$electron.shell.openExternal(this.data.copyContent);
     },
     deleteOneData() {
-      this.$electron.ipcRenderer.send("delete-one-data", {
-        table: this.table,
-        id: this.data.id
-      });
-      this.$electron.ipcRenderer.once("one-deleted", (event, args) => {
-        if (!args) {
-          console.log("数据不存在：", this.data);
-        }
-        let dataArray = this.$parent.clipboardData;
-        let position = dataArray.indexOf(this.data);
-        this.$parent.clipboardData.splice(position, 1);
-      });
+      this.$electron.remote
+        .getGlobal("db")
+        .removeOne(this.table, this.data._id)
+        .then(numRemoved => {
+          window.log.info(`[renderer]: ${numRemoved} removed.`);
+          let dataArray = this.$parent.clipboardData;
+          let position = dataArray.indexOf(this.data);
+          this.$parent.clipboardData.splice(position, 1);
+        });
     },
     //dataURL to blob
     dataURLtoBlob(dataUrl) {
       let arr = dataUrl.split(",");
       let mime = arr[0].match(/:(.*?);/)[1];
-      console.log(mime);
       let bstr = atob(arr[1]);
       let n = bstr.length;
       let u8arr = new Uint8Array(n);

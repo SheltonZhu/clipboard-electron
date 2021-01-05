@@ -25,5 +25,5 @@ pnpm-debug.log*
 #Electron-builder output
 /dist_electron
 
-#lowdb
-db.json
+#database
+*.db

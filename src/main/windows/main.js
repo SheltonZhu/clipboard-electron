@@ -76,7 +76,7 @@ export default async () => {
 
   if (isDevelopment) {
     //为了让画面显示时没有视觉闪烁，
-    log.info("mode: dev");
+    log.info("[main]: mode: dev");
     win.once("ready-to-show", () => {
       win.show();
     });

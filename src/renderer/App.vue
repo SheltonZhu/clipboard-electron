@@ -25,23 +25,20 @@ export default {
   },
   computed: mapState(["clipboardData", "query", "table"]),
   data: () => {
-    return {
-      // table: "historyData",
-      // query: "",
-      // clipboardData: []
-    };
+    return {};
   },
   methods: {
     initData() {
-      this.$electron.ipcRenderer.send("init", {
-        table: this.table,
-        query: this.query
-      });
-      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
-        this.$store.commit("updateClipboardData", arg);
-      });
+      this.$electron.remote
+        .getGlobal("db")
+        .readAll(this.table)
+        .then(allData => {
+          this.$store.commit("updateClipboardData", allData);
+        });
     },
     init() {
+      this.$store.state.table = "historyData";
+      this.$store.state.query = "";
       this.initData();
       let holder = document.getElementById("app");
       holder.ondragover = this.returnFalse;
@@ -83,7 +80,7 @@ html {
   color: #2c3e50;
   box-shadow: 3px -3px 10px 0 rgba(0, 0, 0, 0.1);
   /*margin-top: 3px;*/
-  background-color: rgba(255, 255, 255, 0.72);
+  background-color: #ffffffbf;
   backdrop-filter: saturate(180%) blur(5px);
   width: 100%;
   position: fixed;
@@ -96,5 +93,13 @@ html {
 
 .el-header {
   height: unset !important;
+}
+
+.el-message-box__wrapper {
+  backdrop-filter: saturate(180%) blur(5px);
+}
+.el-message-box {
+  background-color: #ffffffbf !important;
+  backdrop-filter: saturate(180%) blur(5px);
 }
 </style>

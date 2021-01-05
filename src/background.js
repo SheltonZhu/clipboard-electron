@@ -1,18 +1,18 @@
 "use strict";
-import { app, protocol, ipcMain } from "electron";
+import { app, protocol } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
-import uuid from "uuid";
 import initTray from "@/main/tray";
 import initShortCut from "@/main/shortcut";
 import WindowManager from "@/main/windows";
-import db from "@/main/db";
 import config from "@/main/config";
 import log from "@/main/log";
+import db from "@/main/db/stores/clipboardItem";
+
+global.db = db;
 
 let windowManager = new WindowManager();
 const isDevelopment = config.get("isDevelopment");
-
 const gotTheLock = app.requestSingleInstanceLock();
 
 //进程锁
@@ -33,18 +33,17 @@ clipboard
       currentText.trim()
     );
     let data = {
-      id: uuid(),
+      table: "historyData",
       copyType: "Text",
       copyTime: new Date(),
       copyContent: currentText,
-      otherInfo: currentText.length
+      otherInfo: { characterLength: currentText.length }
     };
     if (isLink) {
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
-      data.otherInfo = "";
     }
-    db.addOneData("historyData", data);
+    db.create(data);
     windowManager.mainWindowSafe.webContents.send(
       "clipboard-text-changed",
       data
@@ -53,29 +52,19 @@ clipboard
   .on("image-changed", () => {
     let currentIMage = clipboard.readImage();
     let image = {
-      id: uuid(),
+      table: "historyData",
       copyType: "Image",
       copyTime: new Date(),
       copyContent: currentIMage.toDataURL(),
       otherInfo: currentIMage.getSize()
     };
-    db.addOneData("historyData", image);
+    db.create(image);
     windowManager.mainWindowSafe.webContents.send(
       "clipboard-image-changed",
       image
     );
   })
   .startWatching();
-
-ipcMain
-  .on("init", (event, args) => {
-    let initData = db.getAllData(args.table, args.query, args.selectType);
-    log.info("query", args);
-    event.reply("init-data", initData || []);
-  })
-  .on("delete-one-data", async (event, args) => {
-    event.reply("one-deleted", db.deleteOneData(args.table, { id: args.id }));
-  });
 
 app
   .on("ready", async () => {
@@ -87,7 +76,11 @@ app
         console.error("Vue Devtools failed to install:", e.toString());
       }
     }
-    db.initMyDB();
+    try {
+      await db.initData();
+    } catch (e) {
+      log.error("[main]: initData fail: ", e.toString());
+    }
     windowManager.setMainWindow(await windowManager.initMainWindow());
     initTray();
     initShortCut();
