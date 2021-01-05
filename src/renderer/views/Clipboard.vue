@@ -35,7 +35,7 @@ export default {
       this.init();
     });
   },
-  computed: mapState(["searchType"]),
+  computed: mapState(["searchType", "query"]),
   methods: {
     init() {
       // this.initData();
@@ -61,12 +61,24 @@ export default {
       e.preventDefault();
       this.$refs.clipboard.scrollLeft += parseInt(e.deltaY);
     },
-    insertOneData(event, arg) {
-      if (
-        this.table === "historyData" &&
-        (!this.searchType || this.searchType === arg.copyType)
-      )
-        this.clipboardData.unshift(arg);
+    insertOneData(event, data) {
+      if (this.table === "historyData") {
+        if (this.query) {
+          if (data.copyType === "Image") {
+            if (this.searchType === "Image") this.clipboardData.unshift(data);
+          } else {
+            if (
+              (!this.searchType || this.searchType === data.copyType) &&
+              data.copyContent.indexOf(this.query) >= 0
+            )
+              this.clipboardData.unshift(data);
+          }
+        } else {
+          if (!this.searchType || this.searchType === data.copyType) {
+            this.clipboardData.unshift(data);
+          }
+        }
+      }
     }
   }
 };

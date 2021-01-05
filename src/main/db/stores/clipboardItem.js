@@ -33,9 +33,11 @@ class ClipboardItemStore extends baseStore {
       queryObj.copyType = copyType;
     }
     if (queryKey && queryKey.trim()) {
-      if (!copyType && copyType !== "Image") {
-        queryObj.copyType = { $ne: "Image" };
-        queryObj.copyContent = { $regex: new RegExp(`.*${queryKey}.*`) };
+      if (copyType !== "Image") {
+        if (!copyType) {
+          queryObj.copyType = { $ne: "Image" };
+        }
+        queryObj.copyContent = { $regex: new RegExp(`.*${queryKey}.*`, "i") };
       }
     }
     log.info("[main]: queryString: ", queryObj);

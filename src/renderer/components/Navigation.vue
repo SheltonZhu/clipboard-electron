@@ -7,7 +7,7 @@
         size="small"
         v-model="searchValue"
         class="input-with-select"
-        @keyup.enter.native="doSearch"
+        @keyup.native="doSearch"
       >
         <el-select
           style="width: 80px; "
@@ -52,7 +52,7 @@
               v-model="newLabelValue"
               style="width: 100px"
               @blur="doAddLabel"
-              @keyup.enter.native="doAddLabel"
+              @keyup.enter.native="$event.target.blur"
               ref="newLabelInput"
             ></el-input>
           </el-button>
@@ -150,6 +150,12 @@ export default {
           this.labels = ret;
         });
     },
+    clickLabelAdder() {
+      this.newLabelVisible = true;
+      this.$nextTick(() => {
+        this.$refs.newLabelInput.focus();
+      });
+    },
     doAddLabel() {
       if (!this.newLabelValue.trim()) {
         this.newLabelValue = "未命名";
@@ -164,6 +170,7 @@ export default {
           .then(ret => {
             this.labels.push(ret);
             this.newLabelVisible = false;
+            window.log.info(`[renderer]: addOneLabel: ${JSON.stringify(ret)}.`);
           });
       }
     },
@@ -213,12 +220,6 @@ export default {
     mainLabelClick() {
       if (!this.isSelected) this.$store.commit("updateTable", "historyData");
     },
-    clickLabelAdder() {
-      this.newLabelVisible = true;
-      this.$nextTick(() => {
-        this.$refs.newLabelInput.focus();
-      });
-    },
     quitApp() {
       this.$electron.remote.app.exit();
     },
@@ -250,35 +251,12 @@ export default {
   display: inline-flex;
 }
 
-.nav .el-button {
-  color: #2c3e50;
-  background: #ffffff00;
-  border: 1px solid #ffffff00;
-  font-weight: bold !important;
-  padding: 8px 10px !important;
-}
-
 .input-with-select {
   width: 350px;
   margin: 0 35px;
 }
 
-.clipboard-tag .el-button {
-  margin: 0 5px;
-}
-
-.clipboard-tag .el-button:hover {
-  color: #fff;
-  background: #b9b9b9d1 !important;
-}
-
-.clipboard-tag .is-selected {
-  color: #fff;
-  background: #b9b9b9d1 !important;
-}
-
 .add-btn,
-.search-btn,
 .more-btn {
   border-radius: 50%;
   padding: 0 9px;
@@ -301,6 +279,28 @@ export default {
 }
 </style>
 <style>
+.nav .el-button {
+  color: #2c3e50 !important;
+  background: #ffffff00 !important;
+  border: none !important;
+  font-weight: bold !important;
+  padding: 8px 10px !important;
+}
+
+.clipboard-tag .el-button {
+  margin: 0 5px;
+}
+
+.clipboard-tag .el-button:hover {
+  color: #fff !important;
+  background: #b9b9b9d1 !important;
+}
+
+.clipboard-tag .is-selected {
+  color: #fff !important;
+  background: #b9b9b9d1 !important;
+}
+
 /*.el-input-group__append,*/
 /*.el-input--suffix,*/
 .el-select-dropdown {

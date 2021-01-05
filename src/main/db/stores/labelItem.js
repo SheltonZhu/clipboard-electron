@@ -38,6 +38,7 @@ class LabelItemStore extends baseStore {
   removeOne(_id) {
     return this.db.remove({ _id }, {});
   }
+
   removeLabelAndData(_id) {
     return (async _id => {
       let removedNum = 0;
@@ -46,6 +47,7 @@ class LabelItemStore extends baseStore {
       return removedNum;
     })(_id);
   }
+
   count(query) {
     return this.db.count(query);
   }
@@ -55,7 +57,11 @@ class LabelItemStore extends baseStore {
   }
 
   rename(_id, name) {
-    return this.db.update({ _id }, { $set: { name } });
+    return this.db.update(
+      { _id },
+      { $set: { name } },
+      { returnUpdatedDocs: true }
+    );
   }
 
   recolor(_id, color) {
