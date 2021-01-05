@@ -26,7 +26,7 @@ protocol.registerSchemesAsPrivileged([
 ]);
 
 clipboard
-  .on("text-changed", () => {
+  .on("text-changed", async () => {
     let currentText = clipboard.readText();
     // let isLink = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(
     let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(
@@ -43,13 +43,12 @@ clipboard
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
     }
-    db.create(data);
     windowManager.mainWindowSafe.webContents.send(
       "clipboard-text-changed",
-      data
+      await db.create(data)
     );
   })
-  .on("image-changed", () => {
+  .on("image-changed", async () => {
     let currentIMage = clipboard.readImage();
     let image = {
       table: "historyData",
@@ -58,10 +57,9 @@ clipboard
       copyContent: currentIMage.toDataURL(),
       otherInfo: currentIMage.getSize()
     };
-    db.create(image);
     windowManager.mainWindowSafe.webContents.send(
       "clipboard-image-changed",
-      image
+      await db.create(image)
     );
   })
   .startWatching();

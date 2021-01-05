@@ -25,7 +25,7 @@ export default () => {
         dialog.showMessageBox({
           title: "Electron Clipboard",
           message: "Electron Clipboard",
-          detail: `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub:${pkg.github}\nDescription:${pkg.description}`
+          detail: `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub: ${pkg.github}\nDescription: ${pkg.description}`
         });
       }
     },
@@ -50,7 +50,7 @@ export default () => {
         //   settingWindow.show()
         //   settingWindow.focus()
         // }
-        console.log("打开设置");
+        // console.log("打开设置");
       }
     },
     {

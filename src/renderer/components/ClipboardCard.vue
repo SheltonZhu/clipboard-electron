@@ -130,7 +130,7 @@ export default {
       reader.readAsDataURL(blob);
       reader.onload = e => {
         let link = document.createElement("a");
-        link.download = `${this.data.id}.${type}`;
+        link.download = `${this.data._id}.${type}`;
         link.href = e.target.result;
         link.style.display = "none";
         document.body.appendChild(link);
