@@ -1,2 +1,3 @@
-const { ipcRenderer } = require("electron");
-window.ipcRenderer = ipcRenderer;
+import log from "@/main/log";
+
+window.log = log;
