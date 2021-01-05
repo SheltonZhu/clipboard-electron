@@ -1,8 +1,8 @@
 <template>
   <div class="clipboard" @wheel.prevent="onMouseWheel" ref="clipboard">
     <clipboard-card
-      v-for="(data, idx) in clipboardData"
-      :key="idx"
+      v-for="data in clipboardData"
+      :key="data._id"
       :data="data"
       :table="table"
     />
@@ -26,9 +26,7 @@ export default {
   name: "Clipboard",
   components: { ClipboardCard },
   data: () => {
-    return {
-      // clipboardData: []
-    };
+    return {};
   },
   mounted() {
     this.$nextTick(() => {
@@ -38,7 +36,6 @@ export default {
   computed: mapState(["searchType", "query"]),
   methods: {
     init() {
-      // this.initData();
       this.$electron.ipcRenderer.on(
         "clipboard-text-changed",
         this.insertOneData
@@ -47,15 +44,6 @@ export default {
         "clipboard-image-changed",
         this.insertOneData
       );
-    },
-    initData() {
-      this.$electron.ipcRenderer.send("init", {
-        table: this.table,
-        query: this.query
-      });
-      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
-        this.clipboardData = arg;
-      });
     },
     onMouseWheel(e) {
       e.preventDefault();

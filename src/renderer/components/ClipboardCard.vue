@@ -16,6 +16,9 @@
         select('left', e);
       }
     "
+    @dragstart.native="onDragStart"
+    @dragend.native="onDragEnd"
+    draggable
   >
     <div slot="header" class="clearfix">
       <div class="type">
@@ -52,6 +55,7 @@ export default {
       default: ""
     }
   },
+  mounted() {},
   computed: {
     ...mapState(["labelsData"]),
     isText() {
@@ -73,7 +77,13 @@ export default {
     }
   },
   methods: {
-    hideWin() {
+    onDragStart() {
+      this.$store.commit("updateDragData", this.data);
+    },
+    onDragEnd() {
+      this.$store.commit("updateDragData", null);
+    },
+    hideMainWindow() {
       this.$electron.remote.getCurrentWindow().hide();
     },
     select(direction, e) {
@@ -94,7 +104,7 @@ export default {
       this.copyAndHide();
     },
     copyAndHide() {
-      this.hideWin();
+      this.hideMainWindow();
       this.write2clipboard();
     },
     write2clipboard() {
@@ -108,7 +118,7 @@ export default {
       }
     },
     openLink() {
-      this.hideWin();
+      this.hideMainWindow();
       this.execShellOpenLink(this.data.copyContent);
     },
     share2twitter() {
@@ -172,7 +182,7 @@ export default {
         .getGlobal("db")
         .create(newData)
         .then(ret => {
-          console.log(ret);
+          window.log.info(`[renderer]: add favorite: ${JSON.stringify(ret)}.`);
         });
     },
     //生成右键菜单

@@ -1,10 +1,16 @@
 <template>
-  <span>
+  <span
+    :class="{ 'is-droppable': isDroppable }"
+    @drop="onCardDrop"
+    @dragenter="onCardDragIn"
+    @dragleave="onCardDragOut"
+  >
     <el-button
       v-if="!isRenaming"
       :class="{ 'is-selected': isSelected }"
       @click="onLabelClick"
       @contextmenu.native="onContextmenu"
+      ref="dragBtn"
     >
       <spot :color="labelData.color" />
       {{ labelData.name }}
@@ -45,7 +51,9 @@ export default {
   data: () => {
     return {
       isRenaming: false,
-      newName: ""
+      newName: "",
+      isDroppable: false,
+      dragEl: ""
     };
   },
   mounted() {
@@ -54,12 +62,40 @@ export default {
     });
   },
   computed: {
-    ...mapState(["table"]),
+    ...mapState(["table", "dragData"]),
     isSelected() {
       return this.table === this.labelData._id;
     }
   },
   methods: {
+    onCardDrop() {
+      if (this.labelData._id !== this.dragData.table) {
+        const newData = {};
+        newData.table = this.labelData._id;
+        newData.copyType = this.dragData.copyType;
+        newData.copyTime = this.dragData.copyTime;
+        newData.copyContent = this.dragData.copyContent;
+        newData.otherInfo = this.dragData.otherInfo;
+        this.$electron.remote
+          .getGlobal("db")
+          .create(newData)
+          .then(ret => {
+            window.log.info(
+              `[renderer]: add favorite: ${JSON.stringify(ret)}.`
+            );
+          });
+      }
+      this.isDroppable = false;
+    },
+    onCardDragIn(e) {
+      this.dragEl = e.target;
+      if (this.labelData._id !== this.dragData.table) {
+        this.isDroppable = true;
+      }
+    },
+    onCardDragOut(e) {
+      if (this.dragEl === e.target) this.isDroppable = false;
+    },
     onLabelClick() {
       if (!this.isSelected)
         this.$store.commit("updateTable", this.labelData._id);
@@ -150,4 +186,9 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.is-droppable {
+  background: #15bbf9;
+  border-radius: 5px;
+}
+</style>

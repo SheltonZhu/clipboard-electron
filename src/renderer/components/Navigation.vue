@@ -35,10 +35,9 @@
           <spot color="#aaabab" />
           剪贴板历史
         </el-button>
-
         <favorite-label
-          v-for="(labelData, idx) in labels"
-          :key="idx"
+          v-for="labelData in labels"
+          :key="labelData._id"
           :label-data="labelData"
         />
         <div v-if="newLabelVisible">
@@ -205,13 +204,14 @@ export default {
         .then(async () => {
           const numRemoved = await this.$electron.remote
             .getGlobal("db")
-            .removeAll(this.table);
+            .removeAll("historyData");
           this.$store.commit("updateClipboardData", []);
           this.$message({
             message: `${numRemoved} 条已删除！`,
             type: "success",
             duration: 1000
           });
+          window.log.info(`[renderer]: ${numRemoved} clear.`);
         })
         .catch(() => {})
         .finally(() => {
