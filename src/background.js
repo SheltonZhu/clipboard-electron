@@ -1,5 +1,5 @@
 "use strict";
-import { app, protocol } from "electron";
+import { app, protocol, autoUpdater } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
 import initTray from "@/main/tray";
@@ -14,6 +14,7 @@ global.db = db;
 global.labelDb = labelDb;
 
 let windowManager = new WindowManager();
+let appTray;
 const isDevelopment = config.get("isDevelopment");
 const gotTheLock = app.requestSingleInstanceLock();
 
@@ -83,7 +84,7 @@ app
       log.error("[main]: initData fail: ", e.toString());
     }
     windowManager.setMainWindow(await windowManager.initMainWindow());
-    initTray();
+    appTray = initTray();
     initShortCut();
 
     // win.webContents.send("init-data", initData);
@@ -91,7 +92,7 @@ app
   .on("activate", () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (windowManager.hasWindows()) windowManager.initMainWindow();
+    if (!windowManager.hasWindows()) windowManager.initMainWindow();
   })
   .on("window-all-closed", () => {
     // On macOS it is common for applications and their menu bar
@@ -101,6 +102,7 @@ app
     }
   })
   .on("quit", () => {
+    appTray.quit();
     clipboard.stopWatching();
     if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
   });
@@ -119,35 +121,38 @@ if (isDevelopment) {
   }
 }
 
-// autoUpdater.setFeedURL({
-//   provider: "generic", // 亦可使用 Github
-//   url: "your url"
-// });
-// autoUpdater.autoDownload = false; // 不自動下載更新檔
-//
-// // 有更新檔可下載
-// autoUpdater.on("update-available", info => {
-//   // do something...
-// });
-// // 沒有更新檔可下載
-// autoUpdater.on("update-not-available", info => {
-//   // do something...
-// });
-// // 下載進度，開始下載後會持續觸發此事件
-// autoUpdater.on("download-progress", info => {
-//   console.log(info.percent);
-// });
-// // 下載完成
-// autoUpdater.on(
-//   "update-downloaded",
-//   (event, releaseNotes, releaseName, releaseDate, updateUrl, quitAndUpdate) => {
-//     autoUpdater.quitAndInstall();
-//   }
-// );
-// // 錯誤
-// autoUpdater.on("error", function() {
-//   // do something...
-// });
-//
-// // 開始下載更新
-// autoUpdater.checkForUpdates();
+autoUpdater.setFeedURL({
+  provider: "github", // 亦可使用 Github
+  url: config.get("github")
+});
+autoUpdater.autoDownload = false; // 不自動下載更新檔
+
+// 有更新檔可下載
+autoUpdater.on("update-available", info => {
+  log.info("[main]: has new version: ", info);
+});
+// 沒有更新檔可下載
+autoUpdater.on("update-not-available", info => {
+  log.info("[main]: has no new version: ", info);
+});
+// 下載進度，開始下載後會持續觸發此事件
+autoUpdater.on("download-progress", info => {
+  console.log(info.percent);
+  log.info("[main]: downloading: ", info.percent);
+});
+// 下載完成
+autoUpdater.on(
+  "update-downloaded",
+  (event, releaseNotes, releaseName, releaseDate, updateUrl) => {
+    log.info("[main]: downloaded: ", releaseName, releaseDate, updateUrl);
+    autoUpdater.quitAndInstall();
+  }
+);
+// 錯誤
+autoUpdater.on("error", e => {
+  log.error("[main]: update err", e.toString());
+  // do something...
+});
+
+// 開始下載更新
+autoUpdater.checkForUpdates();
