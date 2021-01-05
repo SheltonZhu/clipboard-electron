@@ -19,6 +19,9 @@ export default new Vuex.Store({
     },
     updateSearchType(state, searchType) {
       state.searchType = searchType;
+    },
+    updateTable(state, tableName) {
+      state.table = tableName;
     }
   },
   actions: {},

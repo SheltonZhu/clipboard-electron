@@ -91,14 +91,33 @@ export default {
       this.copyAndHide();
     },
     copyAndHide() {
+      this.hideWin();
       this.write2clipboard();
-      this.$electron.remote.getCurrentWindow().hide();
     },
     write2clipboard() {
-      this.$electron.remote.clipboard.writeText(this.data.copyContent);
+      if (this.isImage) {
+        let image = this.$electron.remote.nativeImage.createFromDataURL(
+          this.data.copyContent
+        );
+        this.$electron.remote.clipboard.writeImage(image);
+      } else {
+        this.$electron.remote.clipboard.writeText(this.data.copyContent);
+      }
     },
     openLink() {
-      this.$electron.shell.openExternal(this.data.copyContent);
+      this.hideWin();
+      this.execShellOpenLink(this.data.copyContent);
+    },
+    share2twitter() {
+      this.execShellOpenLink("https://twitter.com/compose/tweet");
+      this.copyAndHide();
+    },
+    share2email() {
+      this.execShellOpenLink("mailto:xyz@abc.com?subject=MySubject&body=");
+      this.copyAndHide();
+    },
+    execShellOpenLink(link) {
+      this.$electron.shell.openExternal(link);
     },
     deleteOneData() {
       this.$electron.remote
@@ -145,26 +164,20 @@ export default {
       items.push({
         label: "复制",
         icon: "el-icon-document-copy",
-        onClick: () => {
-          this.copyAndHide();
-        },
+        onClick: this.copyAndHide,
         divided: true
       });
       items.push({
         label: "删除",
         icon: "el-icon-delete",
         divided: true,
-        onClick: () => {
-          this.deleteOneData();
-        }
+        onClick: this.deleteOneData
       });
       if (this.isLink)
         items.push({
           label: "打开链接",
           icon: "el-icon-link",
-          onClick: () => {
-            this.openLink();
-          }
+          onClick: this.openLink
         });
       if (this.isImage)
         items.push({
@@ -178,18 +191,12 @@ export default {
         icon: "el-icon-view"
       });
       items.push({
-        label: "分享（TODO）",
+        label: "分享",
         icon: "el-icon-share",
         minWidth: 0,
         children: [
-          {
-            label: "截取可视化区域",
-            onClick: () => {
-              this.message = "截取可视化区域";
-              console.log("截取可视化区域");
-            }
-          },
-          { label: "截取全屏" }
+          { label: "邮件", onClick: this.share2email },
+          { label: "Twitter", onClick: this.share2twitter }
         ]
       });
 

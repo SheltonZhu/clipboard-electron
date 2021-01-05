@@ -8,8 +8,10 @@ import WindowManager from "@/main/windows";
 import config from "@/main/config";
 import log from "@/main/log";
 import db from "@/main/db/stores/clipboardItem";
+import labelDb from "@/main/db/stores/labelItem";
 
 global.db = db;
+global.labelDb = labelDb;
 
 let windowManager = new WindowManager();
 const isDevelopment = config.get("isDevelopment");
@@ -76,6 +78,7 @@ app
     }
     try {
       await db.initData();
+      await labelDb.initData();
     } catch (e) {
       log.error("[main]: initData fail: ", e.toString());
     }

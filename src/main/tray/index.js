@@ -2,7 +2,7 @@
 import { app, Menu, Tray, dialog } from "electron";
 import path from "path";
 import windowManager from "@/main/windows";
-import pkg from "@/../package.json";
+import config from "electron-cfg";
 
 export default () => {
   let mainWin = new windowManager().mainWindowSafe;
@@ -10,38 +10,7 @@ export default () => {
   // 系统托盘右键菜单
   const trayMenuTemplate = [
     {
-      label: "其他",
-      type: "submenu",
-      submenu: [
-        {
-          label: "其他1",
-          type: "radio"
-        }
-      ]
-    },
-    {
-      label: "©版本信息",
-      click: () => {
-        dialog.showMessageBox({
-          title: "Electron Clipboard",
-          message: "Electron Clipboard",
-          detail: `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub: ${pkg.github}\nDescription: ${pkg.description}`
-        });
-      }
-    },
-    {
-      label: "📓使用手册",
-      click: () => {
-        dialog.showMessageBox({
-          title: "使用手册",
-          message: "使用手册",
-          detail:
-            "【Esc】: 隐藏剪切板\n【Alt+V】: 呼出剪贴板\n【Enter】: 粘贴选中\n【→】: 选中下一个\n【←】: 选中上一个"
-        });
-      }
-    },
-    {
-      label: "⚙设置",
+      label: "设置",
       click: () => {
         // if (settingWindow === null) {
         //   createSettingWindow()
@@ -54,11 +23,42 @@ export default () => {
       }
     },
     {
+      type: "separator"
+    },
+    {
+      label: "版本信息",
+      click: () => {
+        dialog.showMessageBox({
+          title: "Electron Clipboard",
+          message: "Electron Clipboard",
+          detail: config.get("about")
+        });
+      }
+    },
+    {
+      label: "帮助",
+      type: "submenu",
+      submenu: [
+        {
+          label: "使用手册",
+          click: () => {
+            dialog.showMessageBox({
+              title: "使用手册",
+              message: "使用手册",
+              detail: config.get("helpInfo")
+            });
+          }
+        }
+      ]
+    },
+    {
+      type: "separator"
+    },
+    {
       // 系统托盘图标目录
-      label: "💨退出",
+      label: "退出",
       click: () => {
         // 关闭托盘显示
-        appTray.destroy();
         app.exit();
       }
     }
