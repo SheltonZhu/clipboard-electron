@@ -44,20 +44,22 @@
       <!--   收藏栏按钮组   -->
       <div class="clipboard-tag">
         <!--   剪贴板历史   -->
-        <el-button
-          :class="{ 'is-selected': isSelected }"
-          @click="mainLabelClick"
-        >
-          <spot color="#aaabab" />
-          <transition name="bounce" mode="out-in">
-            <div
-              v-if="!isSearching"
-              style="margin-left: 10px;display: inline-block"
-            >
-              剪贴板历史
-            </div>
-          </transition>
-        </el-button>
+        <el-tooltip :disabled="!isSearching" content="剪贴板历史">
+          <el-button
+            :class="{ 'is-selected': isSelected }"
+            @click="mainLabelClick"
+          >
+            <spot color="#aaabab" />
+            <transition name="bounce" mode="out-in">
+              <div
+                v-if="!isSearching"
+                style="margin-left: 10px;display: inline-block"
+              >
+                剪贴板历史
+              </div>
+            </transition>
+          </el-button>
+        </el-tooltip>
         <my-velocity-transition>
           <favorite-label
             :is-searching="isSearching"
@@ -261,7 +263,8 @@ export default {
       };
     },
     execSearchDebounce() {
-      return this.delay("execSearch", 300);
+      return this.delay("execSearch", 200);
+      // return this.execSearch();
     },
     doSearch() {
       this.execSearchDebounce();
@@ -449,8 +452,11 @@ export default {
   0% {
     transform: scale(0);
   }
-  50% {
+  60% {
     transform: scale(1.2, 1.2);
+  }
+  80% {
+    transform: scale(1);
   }
   100% {
     transform: scale(1);

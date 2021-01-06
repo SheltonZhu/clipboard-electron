@@ -1,4 +1,6 @@
 # clipboard-electron
+![](https://img.shields.io/github/languages/top/SheltonZhu/clipboard-electron.svg?style=flat)
+![](https://img.shields.io/github/stars/SheltonZhu/clipboard-electron.svg?style=social)
 ## Environment
 node `v14.15.2`
 
