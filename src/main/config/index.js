@@ -9,6 +9,7 @@ config.set(
   "helpInfo",
   "【Esc】: 隐藏剪切板\n【Alt+V】: 呼出剪贴板\n【Enter】: 粘贴选中\n【→】: 选中下一个\n【←】: 选中上一个"
 );
+config.set("github", pkg.github);
 config.set(
   "about",
   `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub: ${pkg.github}\nDescription: ${pkg.description}`

@@ -65,7 +65,11 @@ class LabelItemStore extends baseStore {
   }
 
   recolor(_id, color) {
-    return this.db.update({ _id }, { $set: { color } });
+    return this.db.update(
+      { _id },
+      { $set: { color } },
+      { returnUpdatedDocs: true }
+    );
   }
 
   // readActive() {

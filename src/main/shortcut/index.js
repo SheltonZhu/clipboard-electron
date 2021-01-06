@@ -6,7 +6,7 @@ export default () => {
 
   try {
     globalShortcut.register("Alt+V", () => {
-      mainWin.show();
+      if (!mainWin.isVisible()) mainWin.show();
       // mainWin.showInactive();
     });
   } catch (e) {

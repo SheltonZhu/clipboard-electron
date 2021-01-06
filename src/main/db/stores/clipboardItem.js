@@ -9,6 +9,7 @@ class ClipboardItemStore extends baseStore {
     super(dbName, clipboardItem);
     this.visibleField = {
       _id: 1,
+      table: 1,
       copyType: 1,
       copyTime: 1,
       copyContent: 1,

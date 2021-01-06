@@ -16,6 +16,9 @@
         select('left', e);
       }
     "
+    @dragstart.native="onDragStart"
+    @dragend.native="onDragEnd"
+    draggable
   >
     <div slot="header" class="clearfix">
       <div class="type">
@@ -52,6 +55,7 @@ export default {
       default: ""
     }
   },
+  mounted() {},
   computed: {
     ...mapState(["labelsData"]),
     isText() {
@@ -73,7 +77,13 @@ export default {
     }
   },
   methods: {
-    hideWin() {
+    onDragStart() {
+      this.$store.commit("updateDragData", this.data);
+    },
+    onDragEnd() {
+      this.$store.commit("updateDragData", null);
+    },
+    hideMainWindow() {
       this.$electron.remote.getCurrentWindow().hide();
     },
     select(direction, e) {
@@ -94,7 +104,7 @@ export default {
       this.copyAndHide();
     },
     copyAndHide() {
-      this.hideWin();
+      this.hideMainWindow();
       this.write2clipboard();
     },
     write2clipboard() {
@@ -108,7 +118,7 @@ export default {
       }
     },
     openLink() {
-      this.hideWin();
+      this.hideMainWindow();
       this.execShellOpenLink(this.data.copyContent);
     },
     share2twitter() {
@@ -123,15 +133,9 @@ export default {
       this.$electron.shell.openExternal(link);
     },
     deleteOneData() {
-      this.$electron.remote
-        .getGlobal("db")
-        .removeOne(this.table, this.data._id)
-        .then(numRemoved => {
-          window.log.info(`[renderer]: ${numRemoved} removed.`);
-          let dataArray = this.$parent.clipboardData;
-          let position = dataArray.indexOf(this.data);
-          this.$parent.clipboardData.splice(position, 1);
-        });
+      // 有动画, clipboard 组件
+      this.$parent.$parent.$parent.deleteOneData(this.data);
+      // this.$parent.deleteOneData(this.data);
     },
     //dataURL to blob
     dataURLtoBlob(dataUrl) {
@@ -172,42 +176,15 @@ export default {
         .getGlobal("db")
         .create(newData)
         .then(ret => {
-          console.log(ret);
+          window.log.info(`[renderer]: add favorite: ${JSON.stringify(ret)}.`);
         });
+    },
+    googleTranslate(url) {
+      this.hideMainWindow();
+      this.execShellOpenLink(`${url}${this.data.copyContent}`);
     },
     //生成右键菜单
     onContextmenu(event) {
-      let items = [];
-      items.push({ label: "粘贴为文本（TODO）", icon: "el-icon-document-add" });
-      items.push({
-        label: "复制",
-        icon: "el-icon-document-copy",
-        onClick: this.copyAndHide,
-        divided: true
-      });
-      items.push({
-        label: "删除",
-        icon: "el-icon-delete",
-        divided: true,
-        onClick: this.deleteOneData
-      });
-      if (this.isLink)
-        items.push({
-          label: "打开链接",
-          icon: "el-icon-link",
-          onClick: this.openLink
-        });
-      if (this.isImage)
-        items.push({
-          label: "保存图片",
-          icon: "el-icon-picture-outline",
-          onClick: this.contextMenuSaveImage
-        });
-
-      items.push({
-        label: "快速查看（TODO）",
-        icon: "el-icon-view"
-      });
       let children = [];
       for (let label of this.labelsData) {
         if (label._id !== this.table) {
@@ -219,20 +196,94 @@ export default {
           });
         }
       }
-      items.push({
-        label: "添加到收藏",
-        icon: "el-icon-star-off",
-        children: children
-      });
-      items.push({
-        label: "分享",
-        icon: "el-icon-share",
-        minWidth: 0,
-        children: [
-          { label: "邮件", onClick: this.share2email },
-          { label: "Twitter", onClick: this.share2twitter }
-        ]
-      });
+      let items = [
+        { label: "粘贴为文本（TODO）", icon: "el-icon-document-add" },
+        {
+          label: "复制",
+          icon: "el-icon-document-copy",
+          onClick: this.copyAndHide,
+          divided: true
+        },
+        {
+          label: "删除",
+          icon: "el-icon-delete",
+          divided: true,
+          onClick: this.deleteOneData
+        },
+        {
+          label: "打开链接",
+          icon: "el-icon-link",
+          onClick: this.openLink,
+          hidden: !this.isLink
+        },
+        {
+          label: "保存图片",
+          icon: "el-icon-picture-outline",
+          onClick: this.contextMenuSaveImage,
+          hidden: !this.isImage
+        },
+        {
+          label: "快速查看（TODO）",
+          icon: "el-icon-view"
+        },
+        {
+          label: "添加到收藏",
+          icon: "el-icon-star-off",
+          children: children
+        },
+        {
+          label: "使用谷歌翻译",
+          icon: "el-icon-camera",
+          hidden: !this.isText,
+          children: [
+            {
+              label: "翻译成简体中文",
+              onClick: () => {
+                this.googleTranslate(
+                  "https://translate.google.cn/?sl=auto&tl=zh-CN&text="
+                );
+              }
+            },
+            {
+              label: "翻译成简体英语",
+              onClick: () => {
+                this.googleTranslate(
+                  "https://translate.google.cn/?sl=auto&tl=zh-CN&text="
+                );
+              }
+            },
+            {
+              label: "翻译成简体日语",
+              onClick: () => {
+                this.googleTranslate(
+                  "https://translate.google.cn/?sl=auto&tl=ja&text="
+                );
+              }
+            },
+            {
+              label: "翻译成繁体中文",
+              onClick: () => {
+                this.googleTranslate(
+                  "https://translate.google.cn/?sl=auto&tl=zh-TW&text="
+                );
+              }
+            }
+          ]
+        },
+        {
+          label: "分享",
+          icon: "el-icon-share",
+          minWidth: 0,
+          children: [
+            {
+              label: "邮件",
+              icon: "el-icon-message",
+              onClick: this.share2email
+            },
+            { label: "Twitter", onClick: this.share2twitter }
+          ]
+        }
+      ];
 
       this.$contextmenu({
         items: items,

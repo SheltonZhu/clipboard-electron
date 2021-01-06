@@ -1,15 +1,27 @@
 <template>
-  <div class="clipboard" @wheel.prevent="onMouseWheel" ref="clipboard">
-    <clipboard-card
-      v-for="(data, idx) in clipboardData"
-      :key="idx"
-      :data="data"
-      :table="table"
-    />
+  <div
+    class="clipboard"
+    @wheel.prevent="onMouseWheel"
+    ref="clipboard"
+    v-loading="loading"
+  >
+    <my-velocity-transition>
+      <clipboard-card
+        v-for="(data, index) in clipboardData"
+        :key="data._id"
+        :data="data"
+        :table="table"
+        :data-index="index"
+      />
+    </my-velocity-transition>
+    <div v-if="isEmpty">
+      <!--        無了無了...😅-->
+    </div>
   </div>
 </template>
 <script>
 import ClipboardCard from "@/renderer/components/ClipboardCard";
+import MyVelocityTransition from "@/renderer/components/MyVelocityTransition";
 import { mapState } from "vuex";
 
 export default {
@@ -24,21 +36,23 @@ export default {
     }
   },
   name: "Clipboard",
-  components: { ClipboardCard },
+  components: { ClipboardCard, MyVelocityTransition },
   data: () => {
-    return {
-      // clipboardData: []
-    };
+    return {};
   },
   mounted() {
     this.$nextTick(() => {
       this.init();
     });
   },
-  computed: mapState(["searchType", "query"]),
+  computed: {
+    ...mapState(["searchType", "query", "loading"]),
+    isEmpty() {
+      return this.clipboardData.length === 0;
+    }
+  },
   methods: {
     init() {
-      // this.initData();
       this.$electron.ipcRenderer.on(
         "clipboard-text-changed",
         this.insertOneData
@@ -47,15 +61,6 @@ export default {
         "clipboard-image-changed",
         this.insertOneData
       );
-    },
-    initData() {
-      this.$electron.ipcRenderer.send("init", {
-        table: this.table,
-        query: this.query
-      });
-      this.$electron.ipcRenderer.once("init-data", (event, arg) => {
-        this.clipboardData = arg;
-      });
     },
     onMouseWheel(e) {
       e.preventDefault();
@@ -79,6 +84,16 @@ export default {
           }
         }
       }
+    },
+    deleteOneData(data) {
+      this.$electron.remote
+        .getGlobal("db")
+        .removeOne(this.table, data._id)
+        .then(numRemoved => {
+          window.log.info(`[renderer]: ${numRemoved} removed.`);
+          let position = this.clipboardData.indexOf(data);
+          this.clipboardData.splice(position, 1);
+        });
     }
   }
 };

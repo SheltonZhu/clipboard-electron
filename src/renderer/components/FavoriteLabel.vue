@@ -1,18 +1,37 @@
 <template>
-  <span>
-    <el-button
+  <span
+    :class="{ 'is-droppable': isDroppable }"
+    @drop="onCardDrop"
+    @dragenter="onCardDragIn"
+    @dragleave="onCardDragOut"
+  >
+    <el-tooltip
       v-if="!isRenaming"
-      :class="{ 'is-selected': isSelected }"
-      @click="onLabelClick"
-      @contextmenu.native="onContextmenu"
+      :disabled="!isSearching"
+      :content="labelData.name"
     >
-      <spot :color="labelData.color" />
-      {{ labelData.name }}
-    </el-button>
-    <div v-if="isRenaming">
+      <el-button
+        :class="{ 'is-selected': isSelected }"
+        @click="onLabelClick"
+        @contextmenu.native="onContextmenu"
+        ref="dragBtn"
+      >
+        <spot :color="labelData.color" />
+        <transition name="bounce" mode="out-in">
+          <div
+            v-if="!isSearching"
+            style="margin-left: 10px;display: inline-block"
+          >
+            {{ labelData.name }}
+          </div>
+        </transition>
+      </el-button>
+    </el-tooltip>
+    <!--  改名字  -->
+    <div v-if="isRenaming" style="display: inline-block">
       <el-button
         class="add-box is-selected"
-        style="padding-top: 0 !important;padding-bottom: 0 !important;"
+        style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
       >
         <spot :color="labelData.color" />
         <el-input
@@ -31,12 +50,17 @@
 <script>
 import Spot from "@/renderer/components/Spot";
 import { mapState } from "vuex";
+import Vue from "vue";
 
 export default {
   name: "FavoriteLabel",
   props: {
     labelData: {
       type: Object
+    },
+    isSearching: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -45,7 +69,9 @@ export default {
   data: () => {
     return {
       isRenaming: false,
-      newName: ""
+      newName: "",
+      isDroppable: false,
+      dragEl: ""
     };
   },
   mounted() {
@@ -54,58 +80,54 @@ export default {
     });
   },
   computed: {
-    ...mapState(["table"]),
+    ...mapState(["table", "dragData"]),
     isSelected() {
       return this.table === this.labelData._id;
     }
   },
   methods: {
+    onCardDrop() {
+      if (this.labelData._id !== this.dragData.table) {
+        const newData = {};
+        newData.table = this.labelData._id;
+        newData.copyType = this.dragData.copyType;
+        newData.copyTime = this.dragData.copyTime;
+        newData.copyContent = this.dragData.copyContent;
+        newData.otherInfo = this.dragData.otherInfo;
+        this.$electron.remote
+          .getGlobal("db")
+          .create(newData)
+          .then(ret => {
+            window.log.info(
+              `[renderer]: add favorite: ${JSON.stringify(ret)}.`
+            );
+          });
+      }
+      this.isDroppable = false;
+    },
+    onCardDragIn(e) {
+      this.dragEl = e.target;
+      if (this.labelData._id !== this.dragData.table) {
+        this.isDroppable = true;
+      }
+    },
+    onCardDragOut(e) {
+      if (this.dragEl === e.target) this.isDroppable = false;
+    },
     onLabelClick() {
       if (!this.isSelected)
         this.$store.commit("updateTable", this.labelData._id);
     },
     removeLabel() {
-      this.$electron.remote.globalShortcut.unregister("Esc");
-      this.$confirm(
-        `确定删除【${this.labelData.name}】?删除的记录不可恢复！`,
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          const _id = this.labelData._id;
-          this.$electron.remote
-            .getGlobal("labelDb")
-            .removeLabelAndData(_id)
-            .then(numRemoved => {
-              window.log.info(`[renderer]: ${numRemoved} removed.`);
-              let dataArray = this.$parent.labels;
-              let position = dataArray.indexOf(this.labelData);
-              this.$parent.labels.splice(position, 1);
-              this.$store.commit("updateLabelsData", this.$parent.labels);
-              if (this.isSelected) {
-                this.$store.commit("updateTable", "historyData");
-              }
-            });
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
-        })
-        .catch(() => {})
-        .finally(() => {
-          this.$electron.remote.globalShortcut.register("Esc", () => {
-            this.$electron.remote.getCurrentWindow().hide();
-          });
-        });
+      //加了动画多了一个parenet
+      this.$parent.$parent.$parent.doRemoveLabel(this.labelData);
+      // this.$parent.doRemoveLabel(this.labelData);
     },
     onRenameLabel() {
       this.isRenaming = true;
       this.$nextTick(() => {
         this.$refs.renameLabelInput.focus();
+        this.$refs.renameLabelInput.select();
       });
     },
     doRenameLabel() {
@@ -123,6 +145,69 @@ export default {
           });
       }
     },
+    onSelectColor(color) {
+      if (color !== this.labelData.color) {
+        this.$electron.remote
+          .getGlobal("labelDb")
+          .recolor(this.labelData._id, color)
+          .then(newLabel => {
+            window.log.info(`[renderer]: update: ${JSON.stringify(newLabel)}.`);
+            this.labelData.color = newLabel.color;
+            this.$forceUpdate();
+          });
+      }
+    },
+    initColorfulSpots() {
+      /* 红: #ff625c 橘色：#fe9700 黄: #ffd74a 绿: #84e162 蓝#15bbf9 紫: #d58fe6 灰: #aaabab */
+      let colorList = [
+        "#ff625c",
+        "#fe9700",
+        "#ffd74a",
+        "#84e162",
+        "#15bbf9",
+        "#d58fe6",
+        "#aaabab"
+      ];
+      const createNodeList = createElement => {
+        let spotList = [];
+        for (let color of colorList) {
+          let node = createElement(
+            "div",
+            {
+              attrs: { class: "circle-border" },
+              on: {
+                click: () => {
+                  this.onSelectColor(color);
+                }
+              }
+            },
+            [
+              createElement("div", {
+                attrs: { class: "circle" },
+                style: `background:${color};`
+              })
+            ]
+          );
+          spotList.push(node);
+        }
+        return spotList;
+      };
+
+      let component = Vue.extend({
+        render(createElement) {
+          return createElement(
+            "div",
+            { attrs: { class: "color-selector" } },
+            createNodeList(createElement)
+          );
+        }
+      });
+      let dom = new component().$mount().$el;
+      const el = document.getElementsByClassName(
+        `context-menu__${this.labelData._id}`
+      )[0].children[0];
+      el.appendChild(dom);
+    },
     onContextmenu(event) {
       let items = [
         {
@@ -135,19 +220,56 @@ export default {
           icon: "el-icon-delete",
           onClick: this.removeLabel,
           divided: true
-        },
-        { label: "" }
+        }
       ];
       this.$contextmenu({
         items: items,
         event,
-        customClass: "context-menu",
+        customClass: `context-menu__${this.labelData._id} context-menu`,
         zIndex: 3
       });
+      this.$nextTick(this.initColorfulSpots);
       return false;
     }
   }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.is-droppable {
+  background: #15bbf9;
+  border-radius: 5px;
+}
+</style>
+<style>
+.context-menu {
+  min-width: 170px !important;
+  padding: 0 !important;
+}
+
+.color-selector {
+  display: flex;
+  margin: 5px 10px 5px;
+}
+
+.context-menu .circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin: 5px 5px;
+}
+.context-menu .circle-border {
+  border-radius: 50%;
+  justify-content: center;
+  flex-wrap: nowrap;
+  border-color: #ffffff00;
+  border-width: 1px;
+  border-style: double;
+}
+.context-menu .circle-border:hover {
+  border-color: #0a98cb;
+}
+.context-menu .is-selected-color {
+  border-color: #15bbf9;
+}
+</style>
