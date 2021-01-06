@@ -13,12 +13,20 @@
       ref="dragBtn"
     >
       <spot :color="labelData.color" />
-      {{ labelData.name }}
+      <transition name="bounce" mode="out-in">
+        <div
+          v-if="!isSearching"
+          style="margin-left: 10px;display: inline-block"
+        >
+          {{ labelData.name }}
+        </div>
+      </transition>
     </el-button>
+    <!--  改名字  -->
     <div v-if="isRenaming">
       <el-button
         class="add-box is-selected"
-        style="padding-top: 0 !important;padding-bottom: 0 !important;"
+        style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
       >
         <spot :color="labelData.color" />
         <el-input
@@ -43,6 +51,10 @@ export default {
   props: {
     labelData: {
       type: Object
+    },
+    isSearching: {
+      type: Boolean,
+      default: false
     }
   },
   components: {
@@ -101,47 +113,15 @@ export default {
         this.$store.commit("updateTable", this.labelData._id);
     },
     removeLabel() {
-      this.$electron.remote.globalShortcut.unregister("Esc");
-      this.$confirm(
-        `确定删除【${this.labelData.name}】?删除的记录不可恢复！`,
-        "提示",
-        {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        }
-      )
-        .then(() => {
-          const _id = this.labelData._id;
-          this.$electron.remote
-            .getGlobal("labelDb")
-            .removeLabelAndData(_id)
-            .then(numRemoved => {
-              window.log.info(`[renderer]: ${numRemoved} removed.`);
-              let dataArray = this.$parent.labels;
-              let position = dataArray.indexOf(this.labelData);
-              this.$parent.labels.splice(position, 1);
-              this.$store.commit("updateLabelsData", this.$parent.labels);
-              if (this.isSelected) {
-                this.$store.commit("updateTable", "historyData");
-              }
-            });
-          this.$message({
-            type: "success",
-            message: "删除成功!"
-          });
-        })
-        .catch(() => {})
-        .finally(() => {
-          this.$electron.remote.globalShortcut.register("Esc", () => {
-            this.$electron.remote.getCurrentWindow().hide();
-          });
-        });
+      //加了动画多了一个parenet
+      this.$parent.$parent.$parent.doRemoveLabel(this.labelData);
+      // this.$parent.doRemoveLabel(this.labelData);
     },
     onRenameLabel() {
       this.isRenaming = true;
       this.$nextTick(() => {
         this.$refs.renameLabelInput.focus();
+        this.$refs.renameLabelInput.select();
       });
     },
     doRenameLabel() {

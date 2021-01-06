@@ -1,49 +1,77 @@
 <template>
   <div class="nav">
     <div class="nav-content">
-      <el-input
-        ref="searchBar"
-        placeholder="请输入内容"
-        size="small"
-        v-model="searchValue"
-        class="input-with-select"
-        @keyup.native="doSearch"
-      >
-        <el-select
-          style="width: 80px; "
-          v-model="selectType"
-          slot="prepend"
-          placeholder="请选择"
+      <!--   搜索框   -->
+      <transition name="slide" mode="out-in">
+        <el-input
+          prefix-icon="el-icon-search"
+          v-if="isSearching"
+          ref="searchBar"
+          placeholder="请输入内容"
+          size="small"
+          v-model="searchValue"
+          class="input-with-select"
+          @keyup.native="doSearch"
+          @clear="doSearch"
+          clearable
         >
-          <el-option label="全部" value=""></el-option>
-          <el-option label="文本" value="Text"></el-option>
-          <el-option label="链接" value="Link"></el-option>
-          <el-option label="图片" value="Image"></el-option>
-        </el-select>
+          <el-select
+            style="width: 80px; "
+            v-model="selectType"
+            slot="prepend"
+            placeholder="请选择"
+          >
+            <el-option label="全部" value=""></el-option>
+            <el-option label="文本" value="Text"></el-option>
+            <el-option label="链接" value="Link"></el-option>
+            <el-option label="图片" value="Image"></el-option>
+          </el-select>
+          <el-button
+            slot="append"
+            icon="el-icon-close"
+            @click="closeSearch"
+          ></el-button>
+        </el-input>
+      </transition>
+      <transition name="fade" mode="out-in">
+        <!--    搜索按钮    -->
         <el-button
-          slot="append"
-          icon="el-icon-search"
-          @click="doSearch"
+          v-if="!isSearching"
+          @click="clickSearchBtn"
+          class="el-icon-search search-btn"
         ></el-button>
-      </el-input>
-
+      </transition>
+      <!--   收藏栏按钮组   -->
       <div class="clipboard-tag">
+        <!--   剪贴板历史   -->
         <el-button
           :class="{ 'is-selected': isSelected }"
           @click="mainLabelClick"
         >
           <spot color="#aaabab" />
-          剪贴板历史
+          <transition name="bounce" mode="out-in">
+            <div
+              v-if="!isSearching"
+              style="margin-left: 10px;display: inline-block"
+            >
+              剪贴板历史
+            </div>
+          </transition>
         </el-button>
-        <favorite-label
-          v-for="labelData in labels"
-          :key="labelData._id"
-          :label-data="labelData"
-        />
+        <my-velocity-transition>
+          <favorite-label
+            :is-searching="isSearching"
+            v-for="labelData in labels"
+            :key="labelData._id"
+            :label-data="labelData"
+          />
+        </my-velocity-transition>
+
+        <!--    添加新标签按钮    -->
         <div v-if="newLabelVisible">
           <el-button
             class="add-box is-selected"
-            style="padding-top: 0 !important;padding-bottom: 0 !important;"
+            style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
           >
             <spot color="#fe9700" />
             <el-input
@@ -58,11 +86,14 @@
         </div>
       </div>
 
+      <!--   添加标签按钮   -->
       <el-button
+        v-if="!isSearching"
         class="el-icon-plus add-btn"
         @click="clickLabelAdder"
       ></el-button>
 
+      <!--   more按钮   -->
       <el-dropdown
         style="float: right;cursor: pointer"
         trigger="click"
@@ -101,12 +132,13 @@
 <script>
 import Spot from "@/renderer/components/Spot";
 import FavoriteLabel from "@/renderer/components/FavoriteLabel";
+import MyVelocityTransition from "@/renderer/components/MyVelocityTransition";
 import { mapState } from "vuex";
 import config from "electron-cfg";
 
 export default {
   name: "Navigation",
-  components: { Spot, FavoriteLabel },
+  components: { Spot, FavoriteLabel, MyVelocityTransition },
   data: () => {
     return {
       activeIndex: "/",
@@ -115,23 +147,20 @@ export default {
       isSearching: false,
       labels: [],
       newLabelValue: "未命名",
-      newLabelVisible: false
+      newLabelVisible: false,
+      delay: null
     };
   },
   mounted() {
     this.initLabels();
+    this.delay = this.Debounce();
   },
   watch: {
     selectType() {
-      this.changeType();
+      this.changeSearchType();
     },
     table() {
-      this.searchValue = "";
-      if (this.selectType) {
-        this.selectType = "";
-      } else {
-        this.doSearch();
-      }
+      this.resetSearch();
     }
   },
   computed: {
@@ -154,6 +183,7 @@ export default {
       this.newLabelVisible = true;
       this.$nextTick(() => {
         this.$refs.newLabelInput.focus();
+        this.$refs.newLabelInput.select();
       });
     },
     doAddLabel() {
@@ -172,16 +202,87 @@ export default {
             this.newLabelVisible = false;
             window.log.info(`[renderer]: addOneLabel: ${JSON.stringify(ret)}.`);
             this.$store.commit("updateLabelsData", this.labels);
+            this.newLabelValue = "未命名";
           });
       }
     },
-    doSearch() {
-      this.execSearch();
+    doRemoveLabel(labelData) {
+      this.$electron.remote.globalShortcut.unregister("Esc");
+      this.$confirm(
+        `确定删除【${labelData.name}】?删除的记录不可恢复！`,
+        "提示",
+        {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }
+      )
+        .then(() => {
+          this.$electron.remote
+            .getGlobal("labelDb")
+            .removeLabelAndData(labelData._id)
+            .then(numRemoved => {
+              window.log.info(`[renderer]: ${numRemoved} removed.`);
+              let position = this.labels.indexOf(labelData);
+              this.labels.splice(position, 1);
+              this.$store.commit("updateLabelsData", this.labels);
+              if (this.isSelected) {
+                this.$store.commit("updateTable", "historyData");
+              }
+            });
+          this.$message({
+            type: "success",
+            message: `【${labelData.name}】删除成功!`,
+            duration: 1000
+          });
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$electron.remote.globalShortcut.register("Esc", () => {
+            this.$electron.remote.getCurrentWindow().hide();
+          });
+        });
     },
-    changeType() {
-      this.execSearch();
+    clickSearchBtn() {
+      this.isSearching = true;
+      this.$nextTick(() => {
+        this.$refs.searchBar.focus();
+      });
+    },
+    Debounce() {
+      let timeout = null;
+      return (fnName, time) => {
+        if (timeout) {
+          clearTimeout(timeout);
+        }
+        timeout = setTimeout(() => {
+          this[fnName]();
+        }, time);
+      };
+    },
+    execSearchDebounce() {
+      return this.delay("execSearch", 300);
+    },
+    doSearch() {
+      this.execSearchDebounce();
+    },
+    closeSearch() {
+      this.isSearching = false;
+      this.resetSearch();
+    },
+    resetSearch() {
+      this.searchValue = "";
+      if (this.selectType) {
+        this.selectType = "";
+      } else {
+        this.execSearchDebounce();
+      }
+    },
+    changeSearchType() {
+      this.execSearchDebounce();
     },
     execSearch() {
+      this.$store.commit("loading", true);
       this.$store.commit("updateQuery", this.searchValue.trim());
       this.$store.commit("updateSearchType", this.selectType);
       this.$electron.remote
@@ -189,6 +290,7 @@ export default {
         .readAll(this.table, this.query, this.searchType)
         .then(ret => {
           this.$store.commit("updateClipboardData", ret);
+          this.$store.commit("loading", false);
         });
     },
     clearClipboard() {
@@ -255,14 +357,20 @@ export default {
 }
 
 .input-with-select {
-  width: 350px;
+  width: 450px;
   margin: 0 35px;
 }
 
 .add-btn,
+.search-btn,
 .more-btn {
   border-radius: 50%;
   padding: 0 9px;
+}
+
+.add-btn,
+.search-btn {
+  margin: 0 15px;
 }
 
 .more-btn {
@@ -285,9 +393,10 @@ export default {
 .nav .el-button {
   color: #2c3e50 !important;
   background: #ffffff00 !important;
-  border: none !important;
   font-weight: bold !important;
   padding: 8px 10px !important;
+  border-color: #ffffff00 !important;
+  border-width: 1px !important;
 }
 
 .clipboard-tag .el-button {
@@ -314,6 +423,9 @@ export default {
 .input-with-select > .el-input__inner {
   background-color: #ffffffbf;
 }
+.el-input--suffix .el-input-group__prepend .el-input__inner {
+  padding: 0 20px !important;
+}
 
 .el-message--success {
   background-color: #f0f9ebbf !important;
@@ -323,5 +435,49 @@ export default {
 .el-dropdown-menu {
   background-color: #ffffffbf !important;
   backdrop-filter: saturate(180%) blur(5px) !important;
+}
+
+.bounce-enter-active {
+  animation: bounce-in 0.5s;
+}
+
+.bounce-leave-active {
+  animation: bounce-in 0.5s reverse;
+  /*animation: 0s;*/
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.2, 1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.fade-enter-active {
+  transition: opacity 1s;
+}
+
+.fade-leave-active {
+  transition: opacity 0s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: opacity 0.5s, transform 0.5s;
+}
+
+.slide-enter,
+.slide-leave-to {
+  opacity: 0;
+  transform: translateX(-30%);
 }
 </style>

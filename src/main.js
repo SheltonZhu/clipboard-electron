@@ -7,7 +7,6 @@ import VueMoment from "vue-moment";
 import Contextmenu from "vue-contextmenujs";
 import moment from "moment";
 import "moment/locale/zh-cn";
-
 import ElementUI from "element-ui";
 import "element-ui/lib/theme-chalk/index.css";
 Vue.use(VueElectron);

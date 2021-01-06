@@ -10,7 +10,8 @@ export default new Vuex.Store({
     table: "historyData",
     searchType: "",
     labelsData: [],
-    dragData: null
+    dragData: null,
+    loading: false
   },
   mutations: {
     updateQuery(state, query) {
@@ -30,6 +31,9 @@ export default new Vuex.Store({
     },
     updateDragData(state, data) {
       state.dragData = data;
+    },
+    loading(state, status) {
+      state.loading = status;
     }
   },
   actions: {},

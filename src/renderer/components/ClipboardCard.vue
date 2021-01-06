@@ -133,15 +133,9 @@ export default {
       this.$electron.shell.openExternal(link);
     },
     deleteOneData() {
-      this.$electron.remote
-        .getGlobal("db")
-        .removeOne(this.table, this.data._id)
-        .then(numRemoved => {
-          window.log.info(`[renderer]: ${numRemoved} removed.`);
-          let dataArray = this.$parent.clipboardData;
-          let position = dataArray.indexOf(this.data);
-          this.$parent.clipboardData.splice(position, 1);
-        });
+      // 有动画, clipboard 组件
+      this.$parent.$parent.$parent.deleteOneData(this.data);
+      // this.$parent.deleteOneData(this.data);
     },
     //dataURL to blob
     dataURLtoBlob(dataUrl) {
