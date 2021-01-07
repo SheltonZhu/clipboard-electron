@@ -202,7 +202,7 @@ export default {
           .then(ret => {
             this.labels.push(ret);
             this.newLabelVisible = false;
-            window.log.info(`[renderer]: addOneLabel: ${JSON.stringify(ret)}.`);
+            window.log.info("[renderer]: addOneLabel: ", ret);
             this.$store.commit("updateLabelsData", this.labels);
             this.newLabelValue = "未命名";
           });
@@ -424,7 +424,7 @@ export default {
 }
 
 .input-with-select > .el-input__inner {
-  background-color: #ffffffbf;
+  background-color: #ffffffa3;
 }
 .el-input--suffix .el-input-group__prepend .el-input__inner {
   padding: 0 20px !important;

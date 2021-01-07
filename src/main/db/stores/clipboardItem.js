@@ -13,7 +13,8 @@ class ClipboardItemStore extends baseStore {
       copyType: 1,
       copyTime: 1,
       copyContent: 1,
-      otherInfo: 1
+      otherInfo: 1,
+      name: 1
     };
   }
 
@@ -38,7 +39,11 @@ class ClipboardItemStore extends baseStore {
         if (!copyType) {
           queryObj.copyType = { $ne: "Image" };
         }
-        queryObj.copyContent = { $regex: new RegExp(`.*${queryKey}.*`, "i") };
+        // queryObj.copyContent = {$or:{ $regex: new RegExp(`.*${queryKey}.*`, "i")} };
+        queryObj["$or"] = [
+          { name: { $regex: new RegExp(`.*${queryKey}.*`, "i") } },
+          { copyContent: { $regex: new RegExp(`.*${queryKey}.*`, "i") } }
+        ];
       }
     }
     log.info("[main]: queryString: ", queryObj);
@@ -63,6 +68,14 @@ class ClipboardItemStore extends baseStore {
 
   read(_id) {
     return this.db.findOne({ _id }).exec();
+  }
+
+  rename(_id, name) {
+    return this.db.update(
+      { _id },
+      { $set: { name } },
+      { returnUpdatedDocs: true }
+    );
   }
 
   // readActive() {

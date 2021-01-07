@@ -35,6 +35,7 @@
       >
         <spot :color="labelData.color" />
         <el-input
+          class="rename-label"
           size="small"
           v-model="newName"
           style="width: 100px"
@@ -98,9 +99,7 @@ export default {
           .getGlobal("db")
           .create(newData)
           .then(ret => {
-            window.log.info(
-              `[renderer]: add favorite: ${JSON.stringify(ret)}.`
-            );
+            window.log.info("[renderer]: add favorite :", ret);
           });
       }
       this.isDroppable = false;
@@ -139,7 +138,7 @@ export default {
           .getGlobal("labelDb")
           .rename(this.labelData._id, this.newName)
           .then(newLabel => {
-            window.log.info(`[renderer]: update: ${JSON.stringify(newLabel)}.`);
+            window.log.info("[renderer]: update: ", newLabel);
             this.labelData.name = newLabel.name;
             this.isRenaming = false;
           });
@@ -151,7 +150,7 @@ export default {
           .getGlobal("labelDb")
           .recolor(this.labelData._id, color)
           .then(newLabel => {
-            window.log.info(`[renderer]: update: ${JSON.stringify(newLabel)}.`);
+            window.log.info("[renderer]: update: ", newLabel);
             this.labelData.color = newLabel.color;
             this.$forceUpdate();
           });
@@ -258,6 +257,7 @@ export default {
   border-radius: 50%;
   margin: 5px 5px;
 }
+
 .context-menu .circle-border {
   border-radius: 50%;
   justify-content: center;
@@ -266,10 +266,17 @@ export default {
   border-width: 1px;
   border-style: double;
 }
+
 .context-menu .circle-border:hover {
   border-color: #0a98cb;
 }
+
 .context-menu .is-selected-color {
   border-color: #15bbf9;
+}
+
+.rename-label input {
+  background-color: #ffffffbf !important;
+  backdrop-filter: saturate(180%) blur(5px) !important;
 }
 </style>

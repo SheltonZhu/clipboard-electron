@@ -15,6 +15,9 @@ const clipboardItemSchema = {
     },
     otherInfo: {
       type: "object"
+    },
+    name: {
+      type: "string"
     }
   },
   required: ["copyType", "copyTime", "copyContent"],
