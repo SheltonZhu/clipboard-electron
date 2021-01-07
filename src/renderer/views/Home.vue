@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="home">
     <title-bar :table="table" v-if="false" />
     <el-header>
       <navigation />
@@ -12,11 +12,11 @@
 <script>
 import Navigation from "@/renderer/components/Navigation";
 import TitleBar from "@/renderer/components/TitleBar";
-import Clipboard from "@/renderer/views/Clipboard";
+import Clipboard from "@/renderer/components/Clipboard";
 import { mapState } from "vuex";
 
 export default {
-  name: "App",
+  name: "Home",
   components: { Navigation, TitleBar, Clipboard },
   mounted() {
     this.$nextTick(() => {
@@ -40,7 +40,7 @@ export default {
       this.$store.state.table = "historyData";
       this.$store.state.query = "";
       this.initData();
-      let holder = document.getElementById("app");
+      let holder = document.getElementById("home");
       holder.ondragover = this.returnFalse;
       holder.ondragleave = this.returnFalse;
       holder.ondragend = this.returnFalse;
@@ -61,18 +61,15 @@ export default {
 };
 </script>
 <style>
-body,
-html {
+body {
   margin: 0 auto;
-  background-image: url("../assets/bg.png");
+  background-image: url("../../assets/bg.png");
   background-size: cover;
 }
-
 ::-webkit-scrollbar {
   display: none; /* Chrome Safari */
 }
-
-#app {
+#home {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

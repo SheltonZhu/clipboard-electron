@@ -1,5 +1,15 @@
 const env = process.env.NODE_ENV === "development" ? "test" : "";
 module.exports = {
+  pages: {
+    settings: {
+      entry: "src/renderer/settings.js",
+      template: "public/index.html"
+    },
+    main: {
+      entry: "src/renderer/main.js",
+      template: "public/index.html"
+    }
+  },
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,

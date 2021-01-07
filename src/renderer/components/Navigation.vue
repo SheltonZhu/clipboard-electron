@@ -41,6 +41,7 @@
           class="el-icon-search search-btn"
         ></el-button>
       </transition>
+
       <!--   收藏栏按钮组   -->
       <div class="clipboard-tag">
         <!--   剪贴板历史   -->
@@ -60,6 +61,7 @@
             </transition>
           </el-button>
         </el-tooltip>
+
         <my-velocity-transition>
           <favorite-label
             :is-searching="isSearching"
@@ -96,11 +98,7 @@
       ></el-button>
 
       <!--   more按钮   -->
-      <el-dropdown
-        style="float: right;cursor: pointer"
-        trigger="click"
-        :tabindex="-1"
-      >
+      <el-dropdown style="float: right;cursor: pointer" trigger="click">
         <el-button class="el-dropdown-link el-icon-more-outline more-btn">
         </el-button>
         <el-dropdown-menu slot="dropdown">
@@ -264,7 +262,6 @@ export default {
     },
     execSearchDebounce() {
       return this.delay("execSearch", 200);
-      // return this.execSearch();
     },
     doSearch() {
       this.execSearchDebounce();
@@ -278,11 +275,11 @@ export default {
       if (this.selectType) {
         this.selectType = "";
       } else {
-        this.execSearchDebounce();
+        this.execSearch();
       }
     },
     changeSearchType() {
-      this.execSearchDebounce();
+      this.execSearch();
     },
     execSearch() {
       this.$store.commit("loading", true);
@@ -381,12 +378,14 @@ export default {
 }
 
 .el-select-dropdown__item.selected,
+.el-select-dropdown__item.focus,
 .el-select-dropdown__item:hover {
   background-color: #b9b9b9d1;
   color: #fff;
 }
 
 .el-dropdown-menu__item:hover,
+.el-dropdown-menu__item:focus,
 .el-dropdown-menu__item.selected {
   background-color: #b9b9b9d1 !important;
   color: #fff !important;
@@ -416,8 +415,6 @@ export default {
   background: #b9b9b9d1 !important;
 }
 
-/*.el-input-group__append,*/
-/*.el-input--suffix,*/
 .el-select-dropdown {
   background-color: #ffffffbf !important;
   backdrop-filter: saturate(180%) blur(5px) !important;
@@ -446,7 +443,6 @@ export default {
 
 .bounce-leave-active {
   animation: bounce-in 0.5s reverse;
-  /*animation: 0s;*/
 }
 @keyframes bounce-in {
   0% {

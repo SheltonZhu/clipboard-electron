@@ -45,16 +45,13 @@ export default {
       el.style.height = 0;
     },
     enter(el, done) {
-      let delay = el.dataset.index * 150;
+      let delay = el.dataset.index * 100;
       setTimeout(() => {
         Velocity(el, { opacity: 1, height: this.height }, { complete: done });
       }, delay);
     },
     leave(el, done) {
-      let delay = el.dataset.index;
-      setTimeout(() => {
-        Velocity(el, { opacity: 0, height: 0 }, { complete: done });
-      }, delay);
+      Velocity(el, { opacity: 0, height: 0 }, { complete: done });
     }
   }
 };

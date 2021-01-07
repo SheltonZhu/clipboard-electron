@@ -1,30 +1,18 @@
-import initMainWindow from "@/main/windows/main";
-import settings from "@/main/windows/settings";
-import { BrowserWindow } from "electron";
+import SettingsWindow from "@/main/windows/settings";
+import MainWindow from "@/main/windows/main";
 
 export default class WindowManager {
-  constructor() {}
-
-  initSettingsWindow() {
-    return settings();
+  async createWindows() {
+    this.settingsWindow = await new SettingsWindow().createWindow();
+    this.mainWindow = await new MainWindow().createWindow();
+    return [this.mainWindow, this.settingsWindow];
   }
 
-  initMainWindow() {
-    return initMainWindow();
+  getMainWindow() {
+    return this.mainWindow;
   }
 
-  hasWindows() {
-    return BrowserWindow.getAllWindows().length !== 0;
-  }
-
-  setMainWindow(win) {
-    WindowManager.mainWindow = win;
-  }
-
-  get mainWindowSafe() {
-    let hasWindows = this.hasWindows();
-    if (hasWindows && WindowManager.mainWindow) return WindowManager.mainWindow;
-    else if (hasWindows) return BrowserWindow.getAllWindows()[0];
-    else return null;
+  getSettingsWindow() {
+    return this.settingsWindow;
   }
 }
