@@ -99,7 +99,7 @@ export default {
           .getGlobal("db")
           .create(newData)
           .then(ret => {
-            window.log.info("[renderer]: add favorite :", ret);
+            window.log.info("add favorite :", ret);
           });
       }
       this.isDroppable = false;
@@ -138,7 +138,7 @@ export default {
           .getGlobal("labelDb")
           .rename(this.labelData._id, this.newName)
           .then(newLabel => {
-            window.log.info("[renderer]: update: ", newLabel);
+            window.log.info("update: ", newLabel);
             this.labelData.name = newLabel.name;
             this.isRenaming = false;
           });
@@ -150,7 +150,7 @@ export default {
           .getGlobal("labelDb")
           .recolor(this.labelData._id, color)
           .then(newLabel => {
-            window.log.info("[renderer]: update: ", newLabel);
+            window.log.info("update: ", newLabel);
             this.labelData.color = newLabel.color;
             this.$forceUpdate();
           });

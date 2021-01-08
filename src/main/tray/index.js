@@ -3,15 +3,15 @@
 import { app, dialog, Menu, Tray } from "electron";
 import config from "@/main/config";
 import path from "path";
-
+import MainWindow from "@/main/windows/main";
+import SettingsWindow from "@/main/windows/settings";
 export default class AppTray {
-  constructor(mainWin, settingsWin) {
-    this.mainWin = mainWin;
-    this.settingsWin = settingsWin;
+  constructor() {
+    AppTray.appTray = undefined;
   }
 
-  createTray() {
-    if (!this.appTray) {
+  async createTray() {
+    if (!AppTray.appTray) {
       // 系统托盘右键菜单
       const contextMenu = Menu.buildFromTemplate(this.createMenu());
       const appIcon = path.join(__static, "icon.png");
@@ -20,9 +20,10 @@ export default class AppTray {
       this.appTray.setContextMenu(contextMenu);
       // 设置托盘悬浮提示
       this.appTray.setToolTip("Electron Clipboard");
+      this.createListener();
+      AppTray.appTray = this.appTray;
     }
-    this.createListener();
-    return this.appTray;
+    return AppTray.appTray;
   }
 
   createListener() {
@@ -36,7 +37,8 @@ export default class AppTray {
       {
         label: "设置",
         click: () => {
-          if (!this.settingsWin.isVisible()) this.settingsWin.show();
+          if (!SettingsWindow.browserWindow.isVisible())
+            SettingsWindow.browserWindow.show();
         }
       },
       {
@@ -67,8 +69,8 @@ export default class AppTray {
   }
 
   toggleMainWindow() {
-    if (this.mainWin.isVisible()) this.mainWin.hide();
-    else this.mainWin.show();
+    if (MainWindow.browserWindow.isVisible()) MainWindow.browserWindow.hide();
+    else MainWindow.browserWindow.show();
   }
 
   showVersionInfo() {

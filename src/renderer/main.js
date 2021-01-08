@@ -1,5 +1,5 @@
 import Vue from "vue";
-import Home from "@/renderer/views/Home.vue";
+import Home from "@/renderer/views/Home";
 import store from "@/renderer/store";
 import VueElectron from "vue-electron";
 import VueMoment from "vue-moment";

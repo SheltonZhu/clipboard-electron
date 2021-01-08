@@ -10,9 +10,11 @@ const isDevelopment = config.get("isDevelopment");
 export default class SettingsWindow {
   constructor() {
     this.SERVER_URL = process.env.WEBPACK_DEV_SERVER_URL;
+    SettingsWindow.browserWindow = undefined;
   }
+
   async createWindow() {
-    if (!this.browserWindow) {
+    if (!SettingsWindow.browserWindow) {
       let browserOptions = {
         webPreferences: {
           experimentalFeatures: true,
@@ -21,12 +23,17 @@ export default class SettingsWindow {
           preload: path.join(__dirname, "preload.js")
         },
         width: 800,
-        height: 600,
+        height: 400,
+        // minWeight: 600,
+        // minHeight: 600,
         // backgroundColor: "#00000000",
         // transparent: true,
         // frame: false,
         // minimizable: false,
         // closable: false,
+        maximizable: false,
+        resizable: false,
+        useContentSize: true,
         autoHideMenuBar: true,
         hasShadow: true,
         skipTaskbar: true,
@@ -48,9 +55,10 @@ export default class SettingsWindow {
         await this.browserWindow.loadURL("app://./settings.html");
       }
       this.createListener();
+      SettingsWindow.browserWindow = this.browserWindow;
     }
 
-    return this.browserWindow;
+    return SettingsWindow.browserWindow;
   }
 
   createListener() {
@@ -61,9 +69,7 @@ export default class SettingsWindow {
 
     if (isDevelopment) {
       //为了让画面显示时没有视觉闪烁，
-      this.browserWindow.once("ready-to-show", () => {
-        // win.show();
-      });
+      this.browserWindow.once("ready-to-show", this.browserWindow.show);
     }
   }
 }

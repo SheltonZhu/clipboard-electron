@@ -1,12 +1,15 @@
 import log from "electron-log";
 import config from "electron-cfg";
-
+import path from "path";
 const isDevelopment = config.get("isDevelopment");
-log.transports.file.getFile();
 if (isDevelopment) {
-  log.transports.file.level = false;
+  log.transports.file.resolvePath = variables => {
+    return path.join(process.cwd(), "log", variables.fileName);
+  };
 } else {
-  log.transports.console.level = false;
+  log.transports.file.resolvePath = variables => {
+    return path.join(config.get("dataPath"), "log", variables.fileName);
+  };
   log.transports.file.level = config.get("logLevel", "error");
 }
 export default log;

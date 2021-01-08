@@ -1,9 +1,10 @@
 {
   "name": "clipboard-electron-app",
-  "version": "1.1.0-beta",
+  "version": "1.2.0-beta",
   "author": "Selton Zhu",
   "github": "https://github.com/SheltonZhu/clipboard-electron",
   "description": "My Electron clipboard app",
+  "productName": "Electron Clipboard",
   "private": true,
   "license": "MIT",
   "scripts": {

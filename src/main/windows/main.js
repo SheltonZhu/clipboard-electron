@@ -1,19 +1,21 @@
 /* global __static */
 
-import { BrowserWindow, globalShortcut, screen } from "electron";
+import { BrowserWindow, screen } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import config from "@/main/config";
-import log from "@/main/log";
 import path from "path";
+import GlobalShortcut from "@/main/shortcut";
 
 const isDevelopment = config.get("isDevelopment");
 
 export default class MainWindow {
   constructor() {
     this.SERVER_URL = process.env.WEBPACK_DEV_SERVER_URL;
+    MainWindow.browserWindow = undefined;
   }
+
   async createWindow() {
-    if (!this.browserWindow) {
+    if (!MainWindow.browserWindow) {
       const display = screen.getPrimaryDisplay().workAreaSize;
       const winWidth = display.width;
       const winHeight = Math.floor(display.height / 3);
@@ -22,6 +24,7 @@ export default class MainWindow {
         webPreferences: {
           experimentalFeatures: true,
           enableRemoteModule: true,
+          // webSecurity: true,
           nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
           preload: path.join(__dirname, "preload.js")
         },
@@ -47,7 +50,6 @@ export default class MainWindow {
         titleBarStyle: "hidden",
         show: false
       };
-
       this.browserWindow = new BrowserWindow(browserOptions);
 
       if (this.SERVER_URL) {
@@ -62,8 +64,9 @@ export default class MainWindow {
         await this.browserWindow.loadURL("app://./main.html");
       }
       this.createListener();
+      MainWindow.browserWindow = this.browserWindow;
     }
-    return this.browserWindow;
+    return MainWindow.browserWindow;
   }
 
   createListener() {
@@ -71,21 +74,12 @@ export default class MainWindow {
       e.preventDefault();
       this.browserWindow.hide();
     });
-
-    this.browserWindow.on("show", () => {
-      globalShortcut.register("Esc", () => {
-        this.browserWindow.hide();
-      });
-    });
-    this.browserWindow.on("hide", () => {
-      globalShortcut.unregister("Esc");
-    });
-
+    this.browserWindow.on("show", GlobalShortcut.registerEsc);
+    this.browserWindow.on("hide", GlobalShortcut.unregisterEsc);
+    if (config.get("hideWhenBlur"))
+      this.browserWindow.on("blur", this.browserWindow.hide);
     if (isDevelopment) {
-      log.info("[main]: mode: dev");
-      this.browserWindow.once("ready-to-show", () => {
-        // this.browserWindow.show();
-      });
+      this.browserWindow.once("ready-to-show", this.browserWindow.show);
     }
   }
 }

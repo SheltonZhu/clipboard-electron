@@ -70,19 +70,28 @@ export default {
       if (this.table === "historyData") {
         if (this.query) {
           if (data.copyType === "Image") {
-            if (this.searchType === "Image") this.clipboardData.unshift(data);
+            if (this.searchType === "Image") this.updateClipboardData(data);
           } else {
             if (
               (!this.searchType || this.searchType === data.copyType) &&
               new RegExp(this.query, "i").test(data.copyContent)
             )
-              this.clipboardData.unshift(data);
+              this.updateClipboardData(data);
           }
         } else {
           if (!this.searchType || this.searchType === data.copyType) {
-            this.clipboardData.unshift(data);
+            this.updateClipboardData(data);
           }
         }
+      }
+    },
+    updateClipboardData(data) {
+      this.clipboardData.unshift(data);
+      const limit = this.$electron.remote
+        .getGlobal("config")
+        .get("historyCapacityNum");
+      if (this.clipboardData.length > limit) {
+        this.clipboardData.pop();
       }
     },
     deleteOneData(data) {
@@ -90,7 +99,7 @@ export default {
         .getGlobal("db")
         .removeOne(this.table, data._id)
         .then(numRemoved => {
-          window.log.info(`[renderer]: ${numRemoved} removed.`);
+          window.log.info(`${numRemoved} removed.`);
           let position = this.clipboardData.indexOf(data);
           this.clipboardData.splice(position, 1);
         });

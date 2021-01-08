@@ -138,7 +138,7 @@ export default {
       // this.$parent.deleteOneData(this.data);
     },
     rename() {
-      this.$electron.remote.globalShortcut.unregister("Esc");
+      this.$electron.remote.getGlobal("shortcut").unregisterEsc();
       this.$prompt("", "重命名", {
         confirmButtonText: "确定",
         cancelButtonText: "取消"
@@ -150,14 +150,12 @@ export default {
             .then(ret => {
               this.data.name = ret.name;
               this.$forceUpdate();
-              window.log.info("[renderer]: renameCard: ", ret);
+              window.log.info("renameCard: ", ret);
             });
         })
         .catch(() => {})
         .finally(() => {
-          this.$electron.remote.globalShortcut.register("Esc", () => {
-            this.$electron.remote.getCurrentWindow().hide();
-          });
+          this.$electron.remote.getGlobal("shortcut").registerEsc();
         });
     },
     //dataURL to blob
@@ -199,7 +197,7 @@ export default {
         .getGlobal("db")
         .create(newData)
         .then(ret => {
-          window.log.info("[renderer]: add favorite :", ret);
+          window.log.info("add favorite :", ret);
         });
     },
     googleTranslate(url) {

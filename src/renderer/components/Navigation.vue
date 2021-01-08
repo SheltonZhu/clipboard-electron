@@ -102,9 +102,9 @@
         <el-button class="el-dropdown-link el-icon-more-outline more-btn">
         </el-button>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item icon="el-icon-delete" @click.native="clearClipboard"
-            >清空剪贴板历史
-          </el-dropdown-item>
+          <!--          <el-dropdown-item icon="el-icon-delete" @click.native="clearClipboard"-->
+          <!--            >清空剪贴板历史-->
+          <!--          </el-dropdown-item>-->
           <el-dropdown-item icon="el-icon-setting" @click.native="openSettings"
             >设置
           </el-dropdown-item>
@@ -200,14 +200,14 @@ export default {
           .then(ret => {
             this.labels.push(ret);
             this.newLabelVisible = false;
-            window.log.info("[renderer]: addOneLabel: ", ret);
+            window.log.info("addOneLabel: ", ret);
             this.$store.commit("updateLabelsData", this.labels);
             this.newLabelValue = "未命名";
           });
       }
     },
     doRemoveLabel(labelData) {
-      this.$electron.remote.globalShortcut.unregister("Esc");
+      this.$electron.remote.getGlobal("shortcut").unregisterEsc();
       this.$confirm(
         `确定删除【${labelData.name}】?删除的记录不可恢复！`,
         "提示",
@@ -222,7 +222,7 @@ export default {
             .getGlobal("labelDb")
             .removeLabelAndData(labelData._id)
             .then(numRemoved => {
-              window.log.info(`[renderer]: ${numRemoved} removed.`);
+              window.log.info(`${numRemoved} removed.`);
               let position = this.labels.indexOf(labelData);
               this.labels.splice(position, 1);
               this.$store.commit("updateLabelsData", this.labels);
@@ -238,9 +238,7 @@ export default {
         })
         .catch(() => {})
         .finally(() => {
-          this.$electron.remote.globalShortcut.register("Esc", () => {
-            this.$electron.remote.getCurrentWindow().hide();
-          });
+          this.$electron.remote.getGlobal("shortcut").registerEsc();
         });
     },
     clickSearchBtn() {
@@ -297,7 +295,7 @@ export default {
       if (!this.clipboardData.length > 0) {
         return;
       }
-      this.$electron.remote.globalShortcut.unregister("Esc");
+      this.$electron.remote.getGlobal("shortcut").unregisterEsc();
       this.$confirm("清空剪贴板历史?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -313,13 +311,11 @@ export default {
             type: "success",
             duration: 1000
           });
-          window.log.info(`[renderer]: ${numRemoved} clear.`);
+          window.log.info(`${numRemoved} clear.`);
         })
         .catch(() => {})
         .finally(() => {
-          this.$electron.remote.globalShortcut.register("Esc", () => {
-            this.$electron.remote.getCurrentWindow().hide();
-          });
+          this.$electron.remote.getGlobal("shortcut").registerEsc();
         });
     },
     mainLabelClick() {
@@ -342,7 +338,9 @@ export default {
         detail: config.get("helpInfo")
       });
     },
-    openSettings() {}
+    openSettings() {
+      this.$electron.remote.getGlobal("settingsWindow").show();
+    }
   }
 };
 </script>
@@ -423,6 +421,7 @@ export default {
 .input-with-select > .el-input__inner {
   background-color: #ffffffa3;
 }
+
 .el-input--suffix .el-input-group__prepend .el-input__inner {
   padding: 0 20px !important;
 }
@@ -436,7 +435,9 @@ export default {
   background-color: #ffffffbf !important;
   backdrop-filter: saturate(180%) blur(5px) !important;
 }
-
+.el-dropdown-menu__item--divided:before {
+  content: none !important;
+}
 .bounce-enter-active {
   animation: bounce-in 0.5s;
 }
@@ -444,6 +445,7 @@ export default {
 .bounce-leave-active {
   animation: bounce-in 0.5s reverse;
 }
+
 @keyframes bounce-in {
   0% {
     transform: scale(0);

@@ -1,16 +1,215 @@
 <template>
   <div id="settings">
-    <div>
-      个性化
-    </div>
-    <div>
-      通用
-    </div>
-    <div>
-      快捷键
-    </div>
-    <div>
-      规则
+    <div class="title-bar"></div>
+    <div class="content">
+      <el-tabs type="border-card">
+        <!--    个性化    -->
+        <el-tab-pane>
+          <span slot="label"><i class="el-icon-magic-stick"></i> 个性化 </span>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">背景虚化：</div>
+            </el-col>
+            <el-col :span="2">
+              <div class="switch">
+                <el-switch
+                  v-model="bgBlur"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">背景图：</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-switch
+                  v-model="bgPic"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+            <el-col :span="8">
+              <div class="text"></div>
+            </el-col>
+          </el-row>
+          <el-row v-if="bgPic">
+            <el-col :offset="8">
+              <el-upload
+                action="#"
+                list-type="picture-card"
+                :auto-upload="false"
+                :multiple="false"
+                :limit="3"
+              >
+                <i slot="default" class="el-icon-plus"></i>
+                <div slot="file" slot-scope="{ file }">
+                  <img
+                    class="el-upload-list__item-thumbnail"
+                    :src="file.url"
+                    alt=""
+                  />
+                  <span class="el-upload-list__item-actions">
+                    <span
+                      class="el-upload-list__item-preview"
+                      @click="handlePictureCardPreview(file)"
+                    >
+                      <i class="el-icon-zoom-in"></i>
+                    </span>
+                    <span
+                      v-if="!disabled"
+                      class="el-upload-list__item-delete"
+                      @click="handleDownload(file)"
+                    >
+                      <i class="el-icon-download"></i>
+                    </span>
+                    <span
+                      v-if="!disabled"
+                      class="el-upload-list__item-delete"
+                      @click="handleRemove(file)"
+                    >
+                      <i class="el-icon-delete"></i>
+                    </span>
+                  </span>
+                </div>
+              </el-upload>
+              <el-dialog :visible.sync="dialogVisible">
+                <img width="100%" :src="dialogImageUrl" alt="" />
+              </el-dialog>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">背景颜色：</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-color-picker
+                  v-model="bgColor"
+                  show-alpha
+                  :predefine="predefineColors"
+                >
+                </el-color-picker>
+              </div>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+
+        <!--    通用    -->
+        <el-tab-pane>
+          <span slot="label"><i class="el-icon-cpu"></i> 通用 </span>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">开机启动：</div>
+            </el-col>
+            <el-col :span="2">
+              <div class="switch">
+                <el-switch
+                  v-model="autoBoot"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">自动插入片段(TODO)：</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-switch
+                  v-model="autoPaste"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+            <el-col :span="8">
+              <div class="text"></div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">窗口失焦是否隐藏剪贴板：</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-switch
+                  v-model="hideWhenBlur"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+            <el-col :span="8">
+              <div class="text"></div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">在通知区域显示图标：</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-switch
+                  v-model="trayIcon"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">历史记录容量：</div>
+            </el-col>
+            <el-col :span="16">
+              <div class="text">
+                <el-slider
+                  tooltip-class="capacity-slider"
+                  :show-tooltip="false"
+                  v-model="historyCapacity"
+                  :min="0"
+                  :max="4"
+                  :step="1"
+                  :marks="{ 0: '10', 1: '50', 2: '100', 3: '500', 4: '∞' }"
+                  @change="changeNum"
+                >
+                </el-slider>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :offset="8" :span="16">
+              <div>
+                <el-button type="primary" @click="clearHistory">
+                  清除剪贴板历史
+                </el-button>
+              </div>
+            </el-col>
+          </el-row>
+        </el-tab-pane>
+
+        <el-tab-pane>
+          <span slot="label"><i class="el-icon-position"></i> 快捷键 </span>
+          快捷键
+        </el-tab-pane>
+        <el-tab-pane>
+          <span slot="label"><i class="el-icon-s-marketing"></i> 规则 </span>
+          规则
+        </el-tab-pane>
+      </el-tabs>
     </div>
   </div>
 </template>
@@ -19,10 +218,141 @@
 export default {
   name: "Settings",
   data: () => {
-    return {};
+    return {
+      bgPic: true,
+      bgBlur: true,
+      historyCapacity: 0,
+      autoBoot: false,
+      hideWhenBlur: false,
+      autoPaste: false,
+      trayIcon: true,
+      other: false,
+      activeColor: "#15bbf9",
+      inactiveColor: "#aaabab",
+      bgColor: "rgba(255, 255, 255, 0.72)",
+      predefineColors: [
+        "rgba(255, 255, 255, 0.72)",
+        "rgba(255,179,167, 0.72)",
+        "rgba(255, 69, 0, 0.68)",
+        "rgba(144, 240, 144, 0.5)",
+        "hsla(209, 100%, 56%, 0.73)",
+        "rgba(35, 37, 35, 0.71)",
+        "rgb(255, 120, 0)",
+        "hsl(181, 100%, 37%)",
+        "rgba(250, 212, 0, 1)"
+      ],
+      dialogImageUrl: "",
+      dialogVisible: false,
+      disabled: false
+    };
   },
-  mounted() {}
+  mounted() {
+    this.$nextTick(() => {
+      this.init();
+    });
+  },
+  watch: {
+    handleRemove(file) {
+      console.log(file);
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = file.url;
+      this.dialogVisible = true;
+    },
+    handleDownload(file) {
+      console.log(file);
+    },
+    bgPic() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgPic",
+        value: this.bgPic
+      });
+    },
+    bgColor() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgColor",
+        value: this.bgColor
+      });
+    },
+    bgBlur() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgBlur",
+        value: this.bgBlur
+      });
+    },
+    autoBoot() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "autoBoot",
+        value: this.autoBoot
+      });
+    },
+    hideWhenBlur() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "hideWhenBlur",
+        value: this.hideWhenBlur
+      });
+    },
+    trayIcon() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "trayIcon",
+        value: this.trayIcon
+      });
+    }
+  },
+  methods: {
+    init() {
+      const config = this.$electron.remote.getGlobal("config");
+      this.bgPic = config.get("bgPic");
+      this.bgColor = config.get("bgColor");
+      this.bgBlur = config.get("bgBlur");
+      this.trayIcon = config.get("trayIcon");
+      this.autoBoot = config.get("autoBoot");
+      this.historyCapacity = config.get("historyCapacity");
+      this.hideWhenBlur = config.get("hideWhenBlur");
+    },
+    changeNum() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "historyCapacity",
+        value: this.historyCapacity
+      });
+    },
+    clearHistory() {
+      this.$electron.remote.getGlobal("shortcut").unregisterEsc();
+      this.$confirm("清空剪贴板历史?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$electron.ipcRenderer.send("settings", {
+            key: "clearHistory",
+            value: true
+          });
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$electron.remote.getGlobal("shortcut").registerEsc();
+        });
+    }
+  }
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.row {
+  margin: 10px 5px;
+}
+
+.type {
+  text-align: right;
+}
+
+.text {
+  text-align: left;
+}
+
+.content {
+  /*min-width: 800px;*/
+  /*min-height: 600px;*/
+}
+</style>
