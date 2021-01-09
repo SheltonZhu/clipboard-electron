@@ -134,7 +134,6 @@ import Spot from "@/renderer/components/Spot";
 import FavoriteLabel from "@/renderer/components/FavoriteLabel";
 import MyVelocityTransition from "@/renderer/components/MyVelocityTransition";
 import { mapState } from "vuex";
-import config from "electron-cfg";
 
 export default {
   name: "Navigation",
@@ -328,14 +327,14 @@ export default {
       this.$electron.remote.dialog.showMessageBox({
         title: "Electron Clipboard",
         message: "Electron Clipboard",
-        detail: config.get("about")
+        detail: this.$electron.remote.getGlobal("config").get("about")
       });
     },
     openHelp() {
       this.$electron.remote.dialog.showMessageBox({
         title: "使用手册",
         message: "使用手册",
-        detail: config.get("helpInfo")
+        detail: this.$electron.remote.getGlobal("config").get("helpInfo")
       });
     },
     openSettings() {

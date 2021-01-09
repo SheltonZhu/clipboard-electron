@@ -1,5 +1,5 @@
 "use strict";
-import { app, protocol, ipcMain, BrowserWindow } from "electron";
+import { app, protocol, ipcMain, BrowserWindow, screen } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
 import GlobalShortcut from "@/main/shortcut";
@@ -128,6 +128,21 @@ app
     } catch (e) {
       mainLog.error("init auto updater fail: ", e.toString());
     }
+    screen.on("display-metrics-changed", async () => {
+      if (MainWindow.browserWindow) {
+        MainWindow.browserWindow.destroy();
+        MainWindow.browserWindow = undefined;
+        global.settingsWindow = await new MainWindow().createWindow();
+      }
+    });
+
+    screen.on("display-removed", () => {
+      log.info("[screen]: display-removed");
+    });
+
+    screen.on("display-added", () => {
+      log.info("[screen]: display-added");
+    });
   })
   .on("activate", async () => {
     // On macOS it's common to re-create a window in the app when the

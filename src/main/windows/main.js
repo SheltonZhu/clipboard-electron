@@ -17,9 +17,6 @@ export default class MainWindow {
   async createWindow() {
     if (!MainWindow.browserWindow) {
       const display = screen.getPrimaryDisplay().workAreaSize;
-      const winWidth = display.width;
-      const winHeight = Math.floor(display.height / 3);
-      const offsetY = winHeight * 2;
       let browserOptions = {
         webPreferences: {
           experimentalFeatures: true,
@@ -28,10 +25,10 @@ export default class MainWindow {
           nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
           preload: path.join(__dirname, "preload.js")
         },
-        width: winWidth,
-        height: winHeight,
+        width: display.width,
+        height: 472,
         x: 0,
-        y: offsetY,
+        y: display.height - 472,
         backgroundColor: "#00000000",
         transparent: true,
         frame: false,

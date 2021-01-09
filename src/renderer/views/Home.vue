@@ -45,8 +45,7 @@ export default {
       bgBlur: true,
       bgColor: "#ffffffbf",
       defaultBg: "/bg/default.png",
-      imageUrl:
-        "https://pbs.twimg.com/media/ErMIGO8UcAAQOkx?format=jpg&name=large"
+      imageUrl: "/bg/default.png"
     };
   },
   methods: {
