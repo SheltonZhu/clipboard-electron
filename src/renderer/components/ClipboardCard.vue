@@ -98,14 +98,18 @@ export default {
       }
     },
     cardOnEnter() {
-      this.copyAndHide();
+      this.copyPasteAndHide();
     },
     cardOnDblClick() {
-      this.copyAndHide();
+      this.copyPasteAndHide();
     },
     copyAndHide() {
       this.hideMainWindow();
       this.write2clipboard();
+    },
+    copyPasteAndHide() {
+      this.hideMainWindow();
+      this.write2clipboardAndPaste();
     },
     write2clipboard() {
       if (this.isImage) {
@@ -116,6 +120,11 @@ export default {
       } else {
         this.$electron.remote.clipboard.writeText(this.data.copyContent);
       }
+    },
+    write2clipboardAndPaste() {
+      this.write2clipboard();
+      if (this.$electron.remote.getGlobal("config").get("directPaste"))
+        this.$electron.remote.getGlobal("robot").keyTap("v", "control");
     },
     openLink() {
       this.hideMainWindow();
@@ -224,7 +233,11 @@ export default {
           icon: "el-icon-document-copy",
           onClick: this.copyAndHide
         },
-        // { label: "粘贴", icon: "el-icon-document-add" },
+        {
+          label: "粘贴",
+          icon: "el-icon-document-add",
+          onClick: this.copyPasteAndHide
+        },
         { label: "重命名", icon: "el-icon-edit", onClick: this.rename },
 
         {

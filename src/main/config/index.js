@@ -30,14 +30,15 @@ let initKeyMap = {
   logLevel: "error",
   initCopyContent: "Thank you for using!!!!",
   initLink: "https://www.bilibili.com/",
+  defaultIcon: "/default_icon.png",
   bgBlur: true,
   bgPic: true,
   defaultBg: "/bg/default.png",
-  defaultIcon: "/default_icon.png",
   bgColor: "#ffffffbf",
-  trayIcon: true,
   autoBoot: false,
+  directPaste: true,
   hideWhenBlur: true,
+  trayIcon: true,
   historyCapacity: 1,
   historyCapacityNum: 50
 };

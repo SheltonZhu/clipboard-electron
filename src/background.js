@@ -1,7 +1,16 @@
 "use strict";
-import { app, protocol, ipcMain, BrowserWindow, screen } from "electron";
+import {
+  app,
+  protocol,
+  ipcMain,
+  BrowserWindow,
+  // nativeImage,
+  screen
+} from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
+import { windowManager } from "node-window-manager";
+import robot from "robotjs";
 import GlobalShortcut from "@/main/shortcut";
 import config from "@/main/config";
 import log from "@/main/log";
@@ -16,12 +25,12 @@ global.db = db;
 global.labelDb = labelDb;
 global.config = config;
 global.shortcut = GlobalShortcut;
+global.robot = robot;
 
 const mainLog = log.scope("main");
 const isDevelopment = config.get("isDevelopment");
 //解决透明闪烁
 app.commandLine.appendSwitch("wm-window-animations-disabled");
-
 //进程锁
 if (!app.requestSingleInstanceLock()) {
   app.quit();
@@ -73,12 +82,29 @@ clipboard
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
     }
+    try {
+      const window = windowManager.getActiveWindow();
+      let iconBuffer = window.getIcon(32);
+      // let icon = nativeImage.createFromBuffer(iconBuffer, {
+      //   width: 64,
+      //   height: 64
+      // });
+      // let base64Icon = icon.toDataURL();
+      log.info("IconBuffer", iconBuffer.length);
+      // log.info("base64: ", base64Icon);
+      // log.info("size: ", icon.getSize());
+      // log.info();
+    } catch (e) {
+      log.error(e);
+    }
+
     MainWindow.browserWindow.webContents.send(
       "clipboard-text-changed",
       await db.create(data)
     );
   })
   .on("image-changed", async () => {
+    // const window = windowManager.getActiveWindow();
     let currentIMage = clipboard.readImage();
     let image = {
       table: "historyData",

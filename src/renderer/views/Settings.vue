@@ -81,12 +81,13 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">自动插入片段(TODO)：</div>
+              <div class="type">开启 Direct Paste：</div>
+              <div class="tip">自动插入片段到当前应用</div>
             </el-col>
             <el-col :span="8">
               <div class="switch">
                 <el-switch
-                  v-model="autoPaste"
+                  v-model="directPaste"
                   :active-color="activeColor"
                   :inactive-color="inactiveColor"
                 >
@@ -153,7 +154,7 @@
           <el-row class="row">
             <el-col :offset="8" :span="16">
               <div>
-                <el-button type="primary" @click="clearHistory">
+                <el-button class="clear-history" @click="clearHistory">
                   清除剪贴板历史
                 </el-button>
               </div>
@@ -179,16 +180,8 @@ export default {
   name: "Settings",
   data: () => {
     return {
-      bgPic: true,
       bgBlur: true,
-      historyCapacity: 0,
-      autoBoot: false,
-      hideWhenBlur: false,
-      autoPaste: false,
-      trayIcon: true,
-      other: false,
-      activeColor: "#15bbf9",
-      inactiveColor: "#aaabab",
+      bgPic: true,
       bgColor: "rgba(255, 255, 255, 0.72)",
       predefineColors: [
         "rgba(255, 255, 255, 0.72)",
@@ -201,9 +194,13 @@ export default {
         "hsl(181, 100%, 37%)",
         "rgba(250, 212, 0, 1)"
       ],
-      dialogImageUrl: "",
-      dialogVisible: false,
-      disabled: false
+      autoBoot: false,
+      directPaste: true,
+      hideWhenBlur: false,
+      trayIcon: true,
+      historyCapacity: 1,
+      activeColor: "#15bbf9",
+      inactiveColor: "#aaabab"
     };
   },
   mounted() {
@@ -212,15 +209,11 @@ export default {
     });
   },
   watch: {
-    handleRemove(file) {
-      console.log(file);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handleDownload(file) {
-      console.log(file);
+    bgBlur() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgBlur",
+        value: this.bgBlur
+      });
     },
     bgPic() {
       this.$electron.ipcRenderer.send("settings", {
@@ -234,16 +227,16 @@ export default {
         value: this.bgColor
       });
     },
-    bgBlur() {
-      this.$electron.ipcRenderer.send("settings", {
-        key: "bgBlur",
-        value: this.bgBlur
-      });
-    },
     autoBoot() {
       this.$electron.ipcRenderer.send("settings", {
         key: "autoBoot",
         value: this.autoBoot
+      });
+    },
+    directPaste() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "directPaste",
+        value: this.directPaste
       });
     },
     hideWhenBlur() {
@@ -262,13 +255,14 @@ export default {
   methods: {
     init() {
       const config = this.$electron.remote.getGlobal("config");
+      this.bgBlur = config.get("bgBlur");
       this.bgPic = config.get("bgPic");
       this.bgColor = config.get("bgColor");
-      this.bgBlur = config.get("bgBlur");
-      this.trayIcon = config.get("trayIcon");
       this.autoBoot = config.get("autoBoot");
-      this.historyCapacity = config.get("historyCapacity");
+      this.directPaste = config.get("directPaste");
+      this.trayIcon = config.get("trayIcon");
       this.hideWhenBlur = config.get("hideWhenBlur");
+      this.historyCapacity = config.get("historyCapacity");
     },
     changeNum() {
       this.$electron.ipcRenderer.send("settings", {
@@ -311,8 +305,14 @@ export default {
   text-align: left;
 }
 
-.content {
-  /*min-width: 800px;*/
-  /*min-height: 600px;*/
+.tip {
+  text-align: right;
+  color: #aaabab;
+  font-size: smaller;
+  margin-top: 2px;
+}
+.clear-history {
+  margin-top: 10px;
+  padding: 2px 20px;
 }
 </style>
