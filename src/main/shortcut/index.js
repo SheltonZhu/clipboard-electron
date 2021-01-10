@@ -1,10 +1,12 @@
 import { globalShortcut } from "electron";
 import MainWindow from "@/main/windows/main";
+import { windowManager } from "node-window-manager";
 
 export default class GlobalShortcut {
   static registerAltAndV() {
     try {
       globalShortcut.register("Alt+V", () => {
+        global.activeWindow = windowManager.getActiveWindow();
         if (!MainWindow.browserWindow.isVisible())
           MainWindow.browserWindow.show();
       });

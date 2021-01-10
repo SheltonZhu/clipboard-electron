@@ -13,6 +13,12 @@ module.exports = {
   },
   pluginOptions: {
     electronBuilder: {
+      externals: ["node-window-manager"],
+      nodeModulesPath: [
+        "../../node_modules",
+        "./node_modules",
+        "./build/Release"
+      ],
       nodeIntegration: true,
       // outputDir: 'electron-builder-output-dir'  // Changing the Output Directory
       preload: "src/preload.js",
@@ -21,21 +27,25 @@ module.exports = {
         publish: [
           {
             provider: "github",
-            url: pkg.github
+            repo: pkg.github
           }
         ],
         // asar: false, // 是否使用 asar 壓縮檔案
         // appId: "myappid.id" + env, // 認證的 appId
         productName: pkg.productName + env,
         // artifactName: '${name}.${ext}', // 檔案名稱樣板，有 ESLint 記得關掉
-        copyright: "Copyright©SheltonZhu",
+        copyright: "Copyright © 2021 SheltonZhu",
         win: {
           legalTrademarks: "clipboard-electron", // 商标
           icon: "build/icons/icon.ico",
+          signingHashAlgorithms: ["sha1", "sha256"],
           target: [
             {
               target: "nsis", // 檔案類型
-              arch: ["x64", "ia32"] // 檔案位元，越多類型檔案越大
+              arch: [
+                "x64"
+                // "ia32"
+              ] // 檔案位元，越多類型檔案越大
             }
           ]
         },
@@ -50,13 +60,13 @@ module.exports = {
         },
         nsis: {
           oneClick: false, // 一键安装
-          perMachine: true, // 是否為每一台機器安裝
           installerIcon: "build/icons/icon.ico",
           uninstallerIcon: "build/icons/icon.ico",
           installerHeaderIcon: "build/icons/icon.ico",
           allowToChangeInstallationDirectory: true,
           createDesktopShortcut: true,
-          createStartMenuShortcut: true
+          createStartMenuShortcut: true,
+          installerLanguages: ["zh_CN", "en_US"]
         }
       }
     }

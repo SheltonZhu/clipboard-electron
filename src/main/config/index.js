@@ -33,10 +33,11 @@ let initKeyMap = {
   bgBlur: true,
   bgPic: true,
   defaultBg: "/bg/default.png",
+  defaultIcon: "/default_icon.png",
   bgColor: "#ffffffbf",
   trayIcon: true,
   autoBoot: false,
-  hideWhenBlur: false,
+  hideWhenBlur: true,
   historyCapacity: 1,
   historyCapacityNum: 50
 };

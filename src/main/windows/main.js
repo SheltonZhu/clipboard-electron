@@ -2,8 +2,8 @@
 
 import { BrowserWindow, screen } from "electron";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
-import config from "@/main/config";
 import path from "path";
+import config from "@/main/config";
 import GlobalShortcut from "@/main/shortcut";
 
 const isDevelopment = config.get("isDevelopment");
@@ -72,7 +72,13 @@ export default class MainWindow {
       this.browserWindow.hide();
     });
     this.browserWindow.on("show", GlobalShortcut.registerEsc);
-    this.browserWindow.on("hide", GlobalShortcut.unregisterEsc);
+    this.browserWindow.on("hide", () => {
+      if (global.activeWindow) {
+        global.activeWindow.bringToTop();
+        global.activeWindow = undefined;
+      }
+      GlobalShortcut.unregisterEsc();
+    });
     if (config.get("hideWhenBlur"))
       this.browserWindow.on("blur", this.browserWindow.hide);
     if (isDevelopment) {
