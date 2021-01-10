@@ -1,5 +1,16 @@
+const pkg = require("./package.json");
 const env = process.env.NODE_ENV === "development" ? "test" : "";
 module.exports = {
+  pages: {
+    settings: {
+      entry: "src/renderer/settings.js",
+      template: "public/index.html"
+    },
+    main: {
+      entry: "src/renderer/main.js",
+      template: "public/index.html"
+    }
+  },
   pluginOptions: {
     electronBuilder: {
       nodeIntegration: true,
@@ -7,16 +18,15 @@ module.exports = {
       preload: "src/preload.js",
       builderOptions: {
         // options placed here will be merged with default configuration and passed to electron-builder
-        publish: ["github"],
-        // publish: [
-        //   {
-        //     provider: 'generic',
-        //     url: ''
-        //   }
-        // ],
+        publish: [
+          {
+            provider: "github",
+            url: pkg.github
+          }
+        ],
         // asar: false, // 是否使用 asar 壓縮檔案
         // appId: "myappid.id" + env, // 認證的 appId
-        productName: "clipboard" + env,
+        productName: pkg.productName + env,
         // artifactName: '${name}.${ext}', // 檔案名稱樣板，有 ESLint 記得關掉
         copyright: "Copyright©SheltonZhu",
         win: {

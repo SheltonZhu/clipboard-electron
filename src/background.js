@@ -1,32 +1,59 @@
 "use strict";
-import { app, protocol, autoUpdater } from "electron";
+import { app, protocol, ipcMain, BrowserWindow, screen } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
 import clipboard from "electron-clipboard-extended";
-import initTray from "@/main/tray";
-import initShortCut from "@/main/shortcut";
-import WindowManager from "@/main/windows";
+import GlobalShortcut from "@/main/shortcut";
 import config from "@/main/config";
 import log from "@/main/log";
 import db from "@/main/db/stores/clipboardItem";
 import labelDb from "@/main/db/stores/labelItem";
+import AppTray from "@/main/tray";
+import MainWindow from "@/main/windows/main";
+import SettingsWindow from "@/main/windows/settings";
+import AutoUpdater from "@/main/update";
 
 global.db = db;
 global.labelDb = labelDb;
+global.config = config;
+global.shortcut = GlobalShortcut;
 
-let windowManager = new WindowManager();
-let appTray;
+const mainLog = log.scope("main");
 const isDevelopment = config.get("isDevelopment");
-const gotTheLock = app.requestSingleInstanceLock();
+//解决透明闪烁
+app.commandLine.appendSwitch("wm-window-animations-disabled");
 
 //进程锁
-if (!gotTheLock) {
+if (!app.requestSingleInstanceLock()) {
   app.quit();
 }
-
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
+ipcMain.on("settings", async (event, args) => {
+  mainLog.info("settings: ", args);
+  if (args.key !== "clearHistory") config.set(args.key, args.value);
+  if (args.key === "trayIcon") {
+    if (args.value) {
+      await new AppTray().createTray();
+    } else {
+      if (AppTray.appTray) AppTray.appTray.destroy();
+      AppTray.appTray = undefined;
+    }
+  } else if (args.key === "autoBoot") {
+    app.setLoginItemSettings({
+      openAtLogin: args.value
+    });
+  } else if (args.key === "hideWhenBlur") {
+    if (args.value) {
+      MainWindow.browserWindow.on("blur", MainWindow.browserWindow.hide);
+    } else {
+      MainWindow.browserWindow.removeAllListeners("blur");
+    }
+  } else {
+    MainWindow.browserWindow.webContents.send("change-settings", args);
+  }
+});
 
 clipboard
   .on("text-changed", async () => {
@@ -46,7 +73,7 @@ clipboard
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
     }
-    windowManager.mainWindowSafe.webContents.send(
+    MainWindow.browserWindow.webContents.send(
       "clipboard-text-changed",
       await db.create(data)
     );
@@ -60,7 +87,7 @@ clipboard
       copyContent: currentIMage.toDataURL(),
       otherInfo: currentIMage.getSize()
     };
-    windowManager.mainWindowSafe.webContents.send(
+    MainWindow.browserWindow.webContents.send(
       "clipboard-image-changed",
       await db.create(image)
     );
@@ -72,27 +99,58 @@ app
     if (isDevelopment && !process.env.IS_TEST) {
       // Install Vue Devtools
       try {
-        await installExtension(VUEJS_DEVTOOLS);
+        let name = await installExtension(VUEJS_DEVTOOLS);
+        mainLog.info(`Added Extension:  ${name}`);
       } catch (e) {
-        console.error("Vue Devtools failed to install:", e.toString());
+        mainLog.error("Vue Devtools failed to install:", e.toString());
       }
     }
     try {
       await db.initData();
       await labelDb.initData();
     } catch (e) {
-      log.error("[main]: initData fail: ", e.toString());
+      mainLog.error("init database fail: ", e.toString());
     }
-    windowManager.setMainWindow(await windowManager.initMainWindow());
-    appTray = initTray();
-    initShortCut();
 
-    // win.webContents.send("init-data", initData);
+    try {
+      await new MainWindow().createWindow();
+      global.settingsWindow = await new SettingsWindow().createWindow();
+      if (config.get("trayIcon")) {
+        await new AppTray().createTray();
+      }
+      GlobalShortcut.registerAltAndV();
+    } catch (e) {
+      mainLog.error("init windows fail: ", e.toString());
+    }
+
+    try {
+      new AutoUpdater();
+    } catch (e) {
+      mainLog.error("init auto updater fail: ", e.toString());
+    }
+    screen.on("display-metrics-changed", async () => {
+      if (MainWindow.browserWindow) {
+        MainWindow.browserWindow.destroy();
+        MainWindow.browserWindow = undefined;
+        global.settingsWindow = await new MainWindow().createWindow();
+      }
+    });
+
+    screen.on("display-removed", () => {
+      log.info("[screen]: display-removed");
+    });
+
+    screen.on("display-added", () => {
+      log.info("[screen]: display-added");
+    });
   })
-  .on("activate", () => {
+  .on("activate", async () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (!windowManager.hasWindows()) windowManager.initMainWindow();
+    if (BrowserWindow.getAllWindows().length === 0) {
+      await new MainWindow().createWindow();
+      await new SettingsWindow().createWindow();
+    }
   })
   .on("window-all-closed", () => {
     // On macOS it is common for applications and their menu bar
@@ -102,7 +160,6 @@ app
     }
   })
   .on("quit", () => {
-    appTray.quit();
     clipboard.stopWatching();
     if (app.hasSingleInstanceLock()) app.releaseSingleInstanceLock();
   });
@@ -120,39 +177,5 @@ if (isDevelopment) {
     });
   }
 }
-
-autoUpdater.setFeedURL({
-  provider: "github", // 亦可使用 Github
-  url: config.get("github")
-});
-autoUpdater.autoDownload = false; // 不自動下載更新檔
-
-// 有更新檔可下載
-autoUpdater.on("update-available", info => {
-  log.info("[main]: has new version: ", info);
-});
-// 沒有更新檔可下載
-autoUpdater.on("update-not-available", info => {
-  log.info("[main]: has no new version: ", info);
-});
-// 下載進度，開始下載後會持續觸發此事件
-autoUpdater.on("download-progress", info => {
-  console.log(info.percent);
-  log.info("[main]: downloading: ", info.percent);
-});
-// 下載完成
-autoUpdater.on(
-  "update-downloaded",
-  (event, releaseNotes, releaseName, releaseDate, updateUrl) => {
-    log.info("[main]: downloaded: ", releaseName, releaseDate, updateUrl);
-    autoUpdater.quitAndInstall();
-  }
-);
-// 錯誤
-autoUpdater.on("error", e => {
-  log.error("[main]: update err", e.toString());
-  // do something...
-});
-
-// 開始下載更新
-autoUpdater.checkForUpdates();
+mainLog.info("configPath: ", config.file());
+mainLog.info("loggPath: ", log.transports.file.getFile().path);

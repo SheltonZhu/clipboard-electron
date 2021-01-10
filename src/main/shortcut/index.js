@@ -1,15 +1,25 @@
 import { globalShortcut } from "electron";
-import windowManager from "@/main/windows";
+import MainWindow from "@/main/windows/main";
 
-export default () => {
-  let mainWin = new windowManager().mainWindowSafe;
-
-  try {
-    globalShortcut.register("Alt+V", () => {
-      if (!mainWin.isVisible()) mainWin.show();
-      // mainWin.showInactive();
-    });
-  } catch (e) {
-    console.error("注册快捷键失败:", e.toString());
+export default class GlobalShortcut {
+  static registerAltAndV() {
+    try {
+      globalShortcut.register("Alt+V", () => {
+        if (!MainWindow.browserWindow.isVisible())
+          MainWindow.browserWindow.show();
+      });
+    } catch (e) {
+      console.error("注册快捷键失败:", e.toString());
+    }
   }
-};
+
+  static registerEsc() {
+    globalShortcut.register("Esc", () => {
+      MainWindow.browserWindow.hide();
+    });
+  }
+
+  static unregisterEsc() {
+    globalShortcut.unregister("Esc");
+  }
+}

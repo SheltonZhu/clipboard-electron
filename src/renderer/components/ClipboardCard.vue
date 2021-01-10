@@ -22,7 +22,7 @@
   >
     <div slot="header" class="clearfix">
       <div class="type">
-        <p class="type">{{ data.copyType }}</p>
+        <p class="type">{{ data["name"] || data.copyType }}</p>
       </div>
       <div class="time">
         <p class="time">{{ new Date(data.copyTime) | moment("from") }}</p>
@@ -137,6 +137,27 @@ export default {
       this.$parent.$parent.$parent.deleteOneData(this.data);
       // this.$parent.deleteOneData(this.data);
     },
+    rename() {
+      this.$electron.remote.getGlobal("shortcut").unregisterEsc();
+      this.$prompt("", "重命名", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(({ value }) => {
+          this.$electron.remote
+            .getGlobal("db")
+            .rename(this.data._id, value)
+            .then(ret => {
+              this.data.name = ret.name;
+              this.$forceUpdate();
+              window.log.info("renameCard: ", ret);
+            });
+        })
+        .catch(() => {})
+        .finally(() => {
+          this.$electron.remote.getGlobal("shortcut").registerEsc();
+        });
+    },
     //dataURL to blob
     dataURLtoBlob(dataUrl) {
       let arr = dataUrl.split(",");
@@ -176,7 +197,7 @@ export default {
         .getGlobal("db")
         .create(newData)
         .then(ret => {
-          window.log.info(`[renderer]: add favorite: ${JSON.stringify(ret)}.`);
+          window.log.info("add favorite :", ret);
         });
     },
     googleTranslate(url) {
@@ -190,6 +211,7 @@ export default {
         if (label._id !== this.table) {
           children.push({
             label: label.name,
+            icon: "el-icon-star-off",
             onClick: () => {
               this.add2favorite(label._id);
             }
@@ -197,13 +219,14 @@ export default {
         }
       }
       let items = [
-        { label: "粘贴为文本（TODO）", icon: "el-icon-document-add" },
         {
           label: "复制",
           icon: "el-icon-document-copy",
-          onClick: this.copyAndHide,
-          divided: true
+          onClick: this.copyAndHide
         },
+        // { label: "粘贴", icon: "el-icon-document-add" },
+        { label: "重命名", icon: "el-icon-edit", onClick: this.rename },
+
         {
           label: "删除",
           icon: "el-icon-delete",
@@ -224,11 +247,12 @@ export default {
         },
         {
           label: "快速查看（TODO）",
-          icon: "el-icon-view"
+          icon: "el-icon-view",
+          hidden: this.isLink
         },
         {
           label: "添加到收藏",
-          icon: "el-icon-star-off",
+          icon: "el-icon-collection-tag",
           children: children
         },
         {
@@ -237,7 +261,8 @@ export default {
           hidden: !this.isText,
           children: [
             {
-              label: "翻译成简体中文",
+              label: "中文(简)",
+              icon: "el-icon-caret-right",
               onClick: () => {
                 this.googleTranslate(
                   "https://translate.google.cn/?sl=auto&tl=zh-CN&text="
@@ -245,7 +270,8 @@ export default {
               }
             },
             {
-              label: "翻译成简体英语",
+              label: "英语",
+              icon: "el-icon-caret-right",
               onClick: () => {
                 this.googleTranslate(
                   "https://translate.google.cn/?sl=auto&tl=zh-CN&text="
@@ -253,7 +279,8 @@ export default {
               }
             },
             {
-              label: "翻译成简体日语",
+              label: "日语",
+              icon: "el-icon-caret-right",
               onClick: () => {
                 this.googleTranslate(
                   "https://translate.google.cn/?sl=auto&tl=ja&text="
@@ -261,7 +288,8 @@ export default {
               }
             },
             {
-              label: "翻译成繁体中文",
+              label: "中文(繁)",
+              icon: "el-icon-caret-right",
               onClick: () => {
                 this.googleTranslate(
                   "https://translate.google.cn/?sl=auto&tl=zh-TW&text="
@@ -402,7 +430,7 @@ export default {
 }
 
 .context-menu {
-  background-color: rgba(255, 255, 255, 0.72) !important;
+  background-color: #ffffffb8 !important;
   backdrop-filter: saturate(180%) blur(5px) !important;
 }
 
@@ -411,6 +439,11 @@ export default {
 .context-menu .menu_item_expand {
   background: #aaababbf !important;
   color: #fff !important;
+  backdrop-filter: saturate(180%) blur(5px) !important;
+}
+
+.el-message-box input {
+  background-color: #ffffff00 !important;
   backdrop-filter: saturate(180%) blur(5px) !important;
 }
 </style>

@@ -10,14 +10,12 @@ class BaseStore {
   constructor(dbName, scheme) {
     let dbPath;
     if (isDevelopment) {
-      dbPath = path.join(process.cwd(), dbName);
+      dbPath = path.join(process.cwd(), "db", dbName);
     } else {
       let dataPath = config.get("dataPath");
-      dbPath = path.join(dataPath, dbName);
-      log.info(`[main]: dataPath: ${dataPath}`);
+      dbPath = path.join(dataPath, "db", dbName);
     }
-    log.info(`[main]: dbPath: ${dbPath}`);
-
+    log.scope("db").info(`dbPath: ${dbPath}`);
     const ajv = new Ajv({
       allErrors: true,
       useDefaults: true
@@ -40,7 +38,7 @@ class BaseStore {
     if (isValid) {
       return this.db.insert(data);
     } else {
-      throw `[main]: data valid fail: ${JSON.stringify(data)}`;
+      throw `data valid fail: ${JSON.stringify(data)}`;
     }
   }
 }

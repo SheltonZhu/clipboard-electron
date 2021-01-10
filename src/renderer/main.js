@@ -1,6 +1,5 @@
 import Vue from "vue";
-import App from "@/renderer/App.vue";
-import router from "@/renderer/router";
+import Home from "@/renderer/views/Home";
 import store from "@/renderer/store";
 import VueElectron from "vue-electron";
 import VueMoment from "vue-moment";
@@ -18,7 +17,6 @@ Vue.use(VueMoment, {
 Vue.config.productionTip = false;
 
 new Vue({
-  router,
   store,
-  render: h => h(App)
-}).$mount("#app");
+  render: h => h(Home)
+}).$mount("#home");
