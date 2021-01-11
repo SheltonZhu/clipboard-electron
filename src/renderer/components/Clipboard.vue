@@ -11,6 +11,7 @@
         :key="data._id"
         :data="data"
         :table="table"
+        :cardIcons="cardIcons"
         :data-index="index"
       />
     </my-velocity-transition>
@@ -38,7 +39,9 @@ export default {
   name: "Clipboard",
   components: { ClipboardCard, MyVelocityTransition },
   data: () => {
-    return {};
+    return {
+      cardIcons: []
+    };
   },
   mounted() {
     this.$nextTick(() => {
@@ -61,12 +64,26 @@ export default {
         "clipboard-image-changed",
         this.insertOneData
       );
+      this.initCardIcon();
+    },
+    initCardIcon() {
+      this.$electron.remote
+        .getGlobal("cardIconDb")
+        .readAll()
+        .then(cardIcons => {
+          window.log.info("icon num: ", cardIcons.length);
+          this.cardIcons = cardIcons;
+        });
     },
     onMouseWheel(e) {
       e.preventDefault();
       this.$refs.clipboard.scrollLeft += parseInt(e.deltaY);
     },
-    insertOneData(event, data) {
+    insertOneData(event, args) {
+      let data = args.data;
+      let isExist = args.isExist;
+      if (!isExist) this.initCardIcon();
+
       if (this.table === "historyData") {
         if (this.query) {
           if (data.copyType === "Image") {

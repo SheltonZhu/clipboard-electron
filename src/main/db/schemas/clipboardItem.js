@@ -18,6 +18,9 @@ const clipboardItemSchema = {
     },
     name: {
       type: "string"
+    },
+    checksum: {
+      type: "string"
     }
   },
   required: ["copyType", "copyTime", "copyContent"],

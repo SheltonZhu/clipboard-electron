@@ -40,7 +40,8 @@ let initKeyMap = {
   hideWhenBlur: true,
   trayIcon: true,
   historyCapacity: 1,
-  historyCapacityNum: 50
+  historyCapacityNum: 50,
+  iconEnable: true
 };
 for (let key in initKeyMap) {
   if (config.get(key, undefined) === undefined)

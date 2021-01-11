@@ -75,6 +75,8 @@ export default {
         window.log.info("settings: ", args);
         if (args.key === "clearHistory") {
           this.clearHistory();
+        } else if (args.key === "iconEnable") {
+          this.$store.commit("updateIconEnable", args.value);
         } else if (args.key === "historyCapacity") {
           const historyCapacityNumMap = {
             0: "10",

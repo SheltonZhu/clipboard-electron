@@ -8,7 +8,7 @@
           <span slot="label"><i class="el-icon-magic-stick"></i> 个性化 </span>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">背景虚化：</div>
+              <div class="type">背景虚化</div>
             </el-col>
             <el-col :span="2">
               <div class="switch">
@@ -23,7 +23,7 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">背景图：</div>
+              <div class="type">背景图</div>
             </el-col>
             <el-col :span="8">
               <div class="switch">
@@ -46,7 +46,7 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">背景颜色：</div>
+              <div class="type">背景颜色</div>
             </el-col>
             <el-col :span="8">
               <div class="switch">
@@ -66,7 +66,7 @@
           <span slot="label"><i class="el-icon-cpu"></i> 通用 </span>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">开机启动：</div>
+              <div class="type">开机启动</div>
             </el-col>
             <el-col :span="2">
               <div class="switch">
@@ -81,7 +81,7 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">开启 Direct Paste：</div>
+              <div class="type">开启 Direct Paste</div>
               <div class="tip">自动插入片段到当前应用</div>
             </el-col>
             <el-col :span="8">
@@ -100,7 +100,7 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">窗口失焦隐藏剪贴板：</div>
+              <div class="type">窗口失焦隐藏剪贴板</div>
             </el-col>
             <el-col :span="8">
               <div class="switch">
@@ -118,7 +118,7 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">在通知区域显示图标：</div>
+              <div class="type">在通知区域显示图标</div>
             </el-col>
             <el-col :span="8">
               <div class="switch">
@@ -133,10 +133,25 @@
           </el-row>
           <el-row class="row">
             <el-col :span="8">
-              <div class="type">历史记录容量：</div>
+              <div class="type">卡片图标</div>
+            </el-col>
+            <el-col :span="8">
+              <div class="switch">
+                <el-switch
+                  v-model="iconEnable"
+                  :active-color="activeColor"
+                  :inactive-color="inactiveColor"
+                >
+                </el-switch>
+              </div>
+            </el-col>
+          </el-row>
+          <el-row class="row">
+            <el-col :span="8">
+              <div class="type">历史记录容量</div>
             </el-col>
             <el-col :span="16">
-              <div class="text">
+              <div class="switch">
                 <el-slider
                   tooltip-class="capacity-slider"
                   :show-tooltip="false"
@@ -198,6 +213,7 @@ export default {
       directPaste: true,
       hideWhenBlur: false,
       trayIcon: true,
+      iconEnable: true,
       historyCapacity: 1,
       activeColor: "#15bbf9",
       inactiveColor: "#aaabab"
@@ -250,6 +266,12 @@ export default {
         key: "trayIcon",
         value: this.trayIcon
       });
+    },
+    iconEnable() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "iconEnable",
+        value: this.iconEnable
+      });
     }
   },
   methods: {
@@ -262,6 +284,7 @@ export default {
       this.directPaste = config.get("directPaste");
       this.trayIcon = config.get("trayIcon");
       this.hideWhenBlur = config.get("hideWhenBlur");
+      this.iconEnable = config.get("iconEnable");
       this.historyCapacity = config.get("historyCapacity");
     },
     changeNum() {
@@ -304,15 +327,27 @@ export default {
 .text {
   text-align: left;
 }
-
+.type:after {
+  content: "：";
+  text-align: left;
+}
 .tip {
   text-align: right;
   color: #aaabab;
   font-size: smaller;
   margin-top: 2px;
 }
+.tip:after {
+  content: " ";
+}
+.switch {
+  margin: 0 10px;
+}
 .clear-history {
   margin-top: 10px;
   padding: 2px 20px;
+}
+#settings {
+  background: #3b3a3a;
 }
 </style>

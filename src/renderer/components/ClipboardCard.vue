@@ -21,11 +21,23 @@
     draggable
   >
     <div slot="header" class="clearfix">
-      <div class="type">
-        <p class="type">{{ data["name"] || data.copyType }}</p>
-      </div>
-      <div class="time">
-        <p class="time">{{ new Date(data.copyTime) | moment("from") }}</p>
+      <div style="  display: inline-flex;height: 64px">
+        <div style="width: 246px;">
+          <div class="type">
+            <p class="type">{{ data["name"] || data.copyType }}</p>
+          </div>
+          <div class="time">
+            <p class="time">{{ new Date(data.copyTime) | moment("from") }}</p>
+          </div>
+        </div>
+
+        <div class="card-icon" v-if="iconEnable">
+          <el-image
+            style="width: 64px; height: 64px"
+            :src="iconUrl"
+            fit="cover"
+          ></el-image>
+        </div>
       </div>
     </div>
     <div class="card-text">
@@ -53,11 +65,25 @@ export default {
     table: {
       type: String,
       default: ""
+    },
+    cardIcons: {
+      type: Array,
+      default: () => {
+        return [];
+      }
     }
   },
-  mounted() {},
+  mounted() {
+    this.$nextTick(() => {
+      const config = this.$electron.remote.getGlobal("config");
+      this.defaultIcon = config.get("defaultIcon");
+    });
+  },
+  data: () => {
+    return { defaultIcon: "/default_icon.png" };
+  },
   computed: {
-    ...mapState(["labelsData"]),
+    ...mapState(["labelsData", "iconEnable"]),
     isText() {
       return this.data.copyType === "Text";
     },
@@ -74,6 +100,16 @@ export default {
         return `${this.data.otherInfo.width} ✖ ${this.data.otherInfo.height} 个像素`;
       }
       return "";
+    },
+    iconUrl() {
+      return this.iconMap[this.data.checksum] || this.defaultIcon;
+    },
+    iconMap() {
+      let iconMap = {};
+      for (let item of this.cardIcons) {
+        iconMap[item.checksum] = item.content;
+      }
+      return iconMap;
     }
   },
   methods: {
@@ -351,12 +387,12 @@ export default {
 
 .box-card p.time {
   color: #fff;
-  margin: 10px 0;
+  margin: 0;
   font-size: smaller;
 }
 
 .box-card p.type {
-  margin: 15px 0 5px 0;
+  margin: 10px 0 5px 0;
   font-size: large;
   color: #fff;
 }
