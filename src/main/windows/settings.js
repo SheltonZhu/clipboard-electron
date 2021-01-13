@@ -22,8 +22,8 @@ export default class SettingsWindow {
           nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
           preload: path.join(__dirname, "preload.js")
         },
-        width: 800,
-        height: 400,
+        width: 600,
+        height: 450,
         backgroundColor: "#fff",
         fullscreenable: false,
         frame: false,

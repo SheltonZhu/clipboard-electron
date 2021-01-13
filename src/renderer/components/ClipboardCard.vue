@@ -198,8 +198,8 @@ export default {
     },
     deleteOneData() {
       // 有动画, clipboard 组件
-      this.$parent.$parent.$parent.deleteOneData(this.data);
-      // this.$parent.deleteOneData(this.data);
+      // this.$parent.$parent.$parent.deleteOneData(this.data);
+      this.$parent.deleteOneData(this.data);
     },
     rename() {
       this.$electron.remote.getGlobal("shortcut").unregisterEsc();
@@ -250,12 +250,9 @@ export default {
       };
     },
     add2favorite(_id) {
-      const newData = {};
+      let newData = Object.assign({}, this.data);
       newData.table = _id;
-      newData.copyType = this.data.copyType;
-      newData.copyTime = this.data.copyTime;
-      newData.copyContent = this.data.copyContent;
-      newData.otherInfo = this.data.otherInfo;
+      delete newData._id;
 
       this.$electron.remote
         .getGlobal("db")
@@ -478,6 +475,8 @@ export default {
 .box-card .el-card__header {
   padding: 0 20px !important;
   text-align: left;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 /*灰: #aaabab 红: #ff625c 绿: #84e162 紫: #d58fe6 黄: #ffd74a 蓝#15bbf9*/

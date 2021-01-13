@@ -5,26 +5,23 @@
     ref="clipboard"
     v-loading="loading"
   >
-    <my-velocity-transition>
-      <clipboard-card
-        v-for="(data, index) in clipboardData"
-        :key="data._id"
-        :data="data"
-        :table="table"
-        :cardIcons="cardIcons"
-        :data-index="index"
-        :index="index"
-        :ref="'cc' + index"
-      />
-    </my-velocity-transition>
+    <clipboard-card
+      v-for="(data, index) in clipboardData"
+      :key="data._id"
+      :data="data"
+      :table="table"
+      :cardIcons="cardIcons"
+      :data-index="index"
+      :index="index"
+      :ref="'cc' + index"
+    />
     <div v-if="isEmpty">
-      <!--        無了無了...😅-->
+      <!--    無了無了...😅    -->
     </div>
   </div>
 </template>
 <script>
 import ClipboardCard from "@/renderer/components/ClipboardCard";
-import MyVelocityTransition from "@/renderer/components/MyVelocityTransition";
 import { mapState } from "vuex";
 
 export default {
@@ -38,7 +35,9 @@ export default {
     }
   },
   name: "Clipboard",
-  components: { ClipboardCard, MyVelocityTransition },
+  components: {
+    ClipboardCard
+  },
   data: () => {
     return {
       cardIcons: []

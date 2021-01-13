@@ -9,10 +9,10 @@
         <el-tab-pane>
           <span slot="label"><i class="el-icon-magic-stick"></i> 个性化 </span>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">背景虚化</div>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="bgBlur"
@@ -24,10 +24,10 @@
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">背景图</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="bgPic"
@@ -37,20 +37,26 @@
                 </el-switch>
               </div>
             </el-col>
-            <el-col :span="8">
-              <div class="text"></div>
-            </el-col>
           </el-row>
           <el-row v-if="bgPic">
-            <el-col :offset="8">
+            <el-col :offset="12">
               <!--       背景图       -->
+              <div>
+                <el-image
+                  v-for="(src, idx) in bgList"
+                  :key="idx"
+                  :src="src"
+                  fit="cover"
+                  style="width: 96px;height: 54px"
+                ></el-image>
+              </div>
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">背景颜色</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-color-picker
                   v-model="bgColor"
@@ -67,10 +73,10 @@
         <el-tab-pane>
           <span slot="label"><i class="el-icon-cpu"></i> 通用 </span>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">开机启动</div>
             </el-col>
-            <el-col :span="2">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="autoBoot"
@@ -82,11 +88,11 @@
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">开启 Direct Paste</div>
               <div class="tip">自动插入片段到当前应用</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="directPaste"
@@ -96,15 +102,12 @@
                 </el-switch>
               </div>
             </el-col>
-            <el-col :span="8">
-              <div class="text"></div>
-            </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">窗口失焦隐藏剪贴板</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="hideWhenBlur"
@@ -114,15 +117,12 @@
                 </el-switch>
               </div>
             </el-col>
-            <el-col :span="8">
-              <div class="text"></div>
-            </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">在通知区域显示图标</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="trayIcon"
@@ -134,10 +134,10 @@
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="type">卡片图标</div>
             </el-col>
-            <el-col :span="8">
+            <el-col :span="12">
               <div class="switch">
                 <el-switch
                   v-model="iconEnable"
@@ -149,10 +149,10 @@
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :span="8">
-              <div class="type">历史记录容量</div>
+            <el-col :span="12">
+              <div class="type" style="margin-top: 15px;">历史记录容量</div>
             </el-col>
-            <el-col :span="16">
+            <el-col :span="12">
               <div class="switch">
                 <el-slider
                   tooltip-class="capacity-slider"
@@ -171,15 +171,15 @@
           <el-row class="row">
             <el-col
               class="warn-info"
-              :offset="8"
-              :span="16"
+              :offset="12"
+              :span="12"
               v-if="historyCapacity === 4"
             >
               ⚠设置为无限会使用更多的存储，进而导致卡顿⚠
             </el-col>
           </el-row>
           <el-row class="row">
-            <el-col :offset="8" :span="16">
+            <el-col :offset="12" :span="12">
               <div>
                 <el-button class="clear-history" @click="clearHistory">
                   清除剪贴板历史
@@ -191,11 +191,66 @@
 
         <el-tab-pane>
           <span slot="label"><i class="el-icon-position"></i> 快捷键 </span>
-          <div style="text-align: center">开发中</div>
+          <div style="text-align: center">
+            <el-row class="row">
+              <el-col :span="12">
+                <div class="type">激活剪贴板</div>
+              </el-col>
+              <el-col :span="12" class="shortcut">
+                <div>
+                  Alt + V
+                </div>
+              </el-col>
+            </el-row>
+            <el-row class="row">
+              <el-col :span="12">
+                <div class="type">显示下一个标签</div>
+              </el-col>
+              <el-col :span="12" class="shortcut">
+                Alt + ]
+              </el-col>
+            </el-row>
+            <el-row class="row">
+              <el-col :span="12">
+                <div class="type">显示上一个标签</div>
+              </el-col>
+              <el-col :span="12" class="shortcut">
+                Alt + [
+              </el-col>
+            </el-row>
+            <el-row class="row">
+              <el-col :span="12">
+                <div class="type">快速粘贴</div>
+              </el-col>
+              <el-col :span="12" class="shortcut">
+                <el-dropdown type="primary">
+                  <span class="el-dropdown-link">
+                    Alt<i class="el-icon-arrow-down el-icon--right"></i>
+                  </span>
+                  <el-dropdown-menu slot="dropdown">
+                    <el-dropdown-item>Ctrl</el-dropdown-item>
+                    <el-dropdown-item>Shift</el-dropdown-item>
+                  </el-dropdown-menu>
+                </el-dropdown>
+                + 1..9
+              </el-col>
+            </el-row>
+          </div>
         </el-tab-pane>
         <el-tab-pane>
           <span slot="label"><i class="el-icon-s-marketing"></i> 规则 </span>
-          <div style="text-align: center">开发中</div>
+          <div style="text-align: center">
+            自定义关键字（正则）
+            <div>
+              <p>
+                account
+              </p>
+            </div>
+            <div>
+              <el-button class="el-icon-plus"></el-button>
+              <el-button class="el-icon-minus"></el-button>
+            </div>
+          </div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -211,6 +266,7 @@ export default {
     return {
       bgBlur: true,
       bgPic: true,
+      bgList: ["/bg/default.png"],
       bgColor: "rgba(255, 255, 255, 0.72)",
       predefineColors: [
         "rgba(255, 255, 255, 0.72)",
@@ -338,9 +394,6 @@ export default {
   text-align: right;
 }
 
-.text {
-  text-align: left;
-}
 .type:after {
   content: "：";
   text-align: left;
@@ -357,10 +410,17 @@ export default {
 .switch {
   margin: 0 10px;
 }
+.warn-info {
+  color: #ffc259;
+}
 .clear-history {
   margin-top: 10px;
   padding: 2px 20px;
 }
+.shortcut {
+  text-align: left;
+}
+
 #settings {
   background: #fff;
 }
@@ -372,9 +432,6 @@ export default {
 .el-tabs {
   box-shadow: none;
   border: none;
-}
-.warn-info {
-  color: #ffc259;
 }
 </style>
 <style>
@@ -403,5 +460,8 @@ body {
 .el-tabs__nav {
   left: 50%;
   transform: translateX(-50%) !important;
+}
+.switch .el-slider {
+  margin: 0 10px;
 }
 </style>

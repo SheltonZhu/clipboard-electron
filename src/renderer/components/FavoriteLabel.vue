@@ -89,12 +89,9 @@ export default {
   methods: {
     onCardDrop() {
       if (this.labelData._id !== this.dragData.table) {
-        const newData = {};
+        let newData = Object.assign({}, this.dragData);
         newData.table = this.labelData._id;
-        newData.copyType = this.dragData.copyType;
-        newData.copyTime = this.dragData.copyTime;
-        newData.copyContent = this.dragData.copyContent;
-        newData.otherInfo = this.dragData.otherInfo;
+        delete newData._id;
         this.$electron.remote
           .getGlobal("db")
           .create(newData)
