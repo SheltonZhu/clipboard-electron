@@ -1,8 +1,11 @@
 <template>
   <div class="fake-title-bar">
     <div class="handle-bar">
-      <!-- 如果是windows系统 就加上模拟的操作按钮-->
-      <!--        <i class="el-icon-minus" @click="minimizeWindow"></i>-->
+      <el-button
+        circle
+        class="el-icon-minus"
+        @click="minimizeWindow"
+      ></el-button>
       <el-button circle class="el-icon-close" @click="closeWindow"></el-button>
     </div>
   </div>
@@ -14,6 +17,9 @@ export default {
   methods: {
     closeWindow() {
       this.$electron.remote.getCurrentWindow().hide();
+    },
+    minimizeWindow() {
+      this.$electron.remote.getCurrentWindow().minimize();
     }
   }
 };
@@ -28,9 +34,17 @@ export default {
   margin-top: 4px;
 }
 .fake-title-bar .el-button {
-  background: #ff6059;
-  border: 1px solid #e28a8a;
   padding: 4px;
   font-weight: bold;
+  -webkit-app-region: no-drag;
+}
+.fake-title-bar .el-icon-close {
+  background: #ff6059;
+  border: 1px solid #e28a8a;
+}
+
+.fake-title-bar .el-icon-minus {
+  background: #ffc259;
+  border: 1px solid #e2bf8a;
 }
 </style>

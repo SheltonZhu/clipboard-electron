@@ -1,10 +1,10 @@
 "use strict";
 import {
   app,
-  protocol,
-  ipcMain,
   BrowserWindow,
-  // nativeImage,
+  ipcMain,
+  nativeImage,
+  protocol,
   screen
 } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -16,6 +16,7 @@ import config from "@/main/config";
 import log from "@/main/log";
 import db from "@/main/db/stores/clipboardItem";
 import labelDb from "@/main/db/stores/labelItem";
+import cardIconDb from "@/main/db/stores/cardIconItem";
 import AppTray from "@/main/tray";
 import MainWindow from "@/main/windows/main";
 import SettingsWindow from "@/main/windows/settings";
@@ -23,6 +24,7 @@ import AutoUpdater from "@/main/update";
 
 global.db = db;
 global.labelDb = labelDb;
+global.cardIconDb = cardIconDb;
 global.config = config;
 global.shortcut = GlobalShortcut;
 global.robot = robot;
@@ -64,11 +66,20 @@ ipcMain.on("settings", async (event, args) => {
   }
 });
 
+let getCurrentWindowIcon = () => {
+  const window = windowManager.getActiveWindow();
+  let iconBuffer = window.getIcon(32);
+  let icon = nativeImage.createFromBuffer(iconBuffer, {
+    width: 64,
+    height: 64
+  });
+  return icon.toDataURL();
+};
+
 clipboard
   .on("text-changed", async () => {
     let currentText = clipboard.readText();
-    // let isLink = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(
-    let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(
+    let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/.test(
       currentText.trim()
     );
     let data = {
@@ -82,26 +93,25 @@ clipboard
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
     }
+    let base64Icon = getCurrentWindowIcon();
     try {
-      const window = windowManager.getActiveWindow();
-      let iconBuffer = window.getIcon(32);
-      // let icon = nativeImage.createFromBuffer(iconBuffer, {
-      //   width: 64,
-      //   height: 64
-      // });
-      // let base64Icon = icon.toDataURL();
-      log.info("IconBuffer", iconBuffer.length);
-      // log.info("base64: ", base64Icon);
-      // log.info("size: ", icon.getSize());
-      // log.info();
+      let isExist;
+      [data.checksum, isExist] = await cardIconDb.getChecksumAndExist(
+        base64Icon
+      );
+      if (!isExist)
+        await cardIconDb.create({
+          content: base64Icon,
+          checksum: data.checksum
+        });
+
+      MainWindow.browserWindow.webContents.send("clipboard-text-changed", {
+        data: await db.create(data),
+        isExist: isExist
+      });
     } catch (e) {
       log.error(e);
     }
-
-    MainWindow.browserWindow.webContents.send(
-      "clipboard-text-changed",
-      await db.create(data)
-    );
   })
   .on("image-changed", async () => {
     // const window = windowManager.getActiveWindow();
@@ -113,10 +123,25 @@ clipboard
       copyContent: currentIMage.toDataURL(),
       otherInfo: currentIMage.getSize()
     };
-    MainWindow.browserWindow.webContents.send(
-      "clipboard-image-changed",
-      await db.create(image)
-    );
+    try {
+      let base64Icon = getCurrentWindowIcon();
+      let isExist;
+      [image.checksum, isExist] = await cardIconDb.getChecksumAndExist(
+        base64Icon
+      );
+      if (!isExist)
+        await cardIconDb.create({
+          content: base64Icon,
+          checksum: image.checksum
+        });
+
+      MainWindow.browserWindow.webContents.send("clipboard-image-changed", {
+        data: await db.create(image),
+        isExist: isExist
+      });
+    } catch (e) {
+      log.error(e);
+    }
   })
   .startWatching();
 

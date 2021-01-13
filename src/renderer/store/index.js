@@ -11,7 +11,8 @@ export default new Vuex.Store({
     searchType: "",
     labelsData: [],
     dragData: null,
-    loading: false
+    loading: false,
+    iconEnable: true
   },
   mutations: {
     updateQuery(state, query) {
@@ -34,6 +35,9 @@ export default new Vuex.Store({
     },
     loading(state, status) {
       state.loading = status;
+    },
+    updateIconEnable(state, enable) {
+      state.iconEnable = enable;
     }
   },
   actions: {},

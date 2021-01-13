@@ -15,7 +15,8 @@ class ClipboardItemStore extends baseStore {
       copyTime: 1,
       copyContent: 1,
       otherInfo: 1,
-      name: 1
+      name: 1,
+      checksum: 1
     };
   }
 

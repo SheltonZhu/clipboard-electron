@@ -4,11 +4,13 @@ module.exports = {
   pages: {
     settings: {
       entry: "src/renderer/settings.js",
-      template: "public/index.html"
+      template: "public/index.html",
+      title: "设置"
     },
     main: {
       entry: "src/renderer/main.js",
-      template: "public/index.html"
+      template: "public/index.html",
+      title: "剪贴板"
     }
   },
   pluginOptions: {

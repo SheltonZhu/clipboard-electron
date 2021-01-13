@@ -38,7 +38,7 @@ export default {
       this.init();
     });
   },
-  computed: mapState(["clipboardData", "query", "table"]),
+  computed: mapState(["clipboardData", "query", "table", "labelsData"]),
   data: () => {
     return {
       bgPic: true,
@@ -50,9 +50,22 @@ export default {
   },
   methods: {
     init() {
+      this.initShortCut();
       this.initSettings();
       this.initData();
       this.initFileDragEvent();
+    },
+    initShortCut() {
+      this.$electron.remote.getCurrentWindow().on("show", () => {
+        this.$electron.remote.globalShortcut.register("Alt+[", () => {
+          window.log.info("global previous");
+          this.previousLabel();
+        });
+        this.$electron.remote.globalShortcut.register("Alt+]", () => {
+          window.log.info("global next");
+          this.nextLabel();
+        });
+      });
     },
     initFileDragEvent() {
       let holder = document.getElementById("home");
@@ -75,6 +88,8 @@ export default {
         window.log.info("settings: ", args);
         if (args.key === "clearHistory") {
           this.clearHistory();
+        } else if (args.key === "iconEnable") {
+          this.$store.commit("updateIconEnable", args.value);
         } else if (args.key === "historyCapacity") {
           const historyCapacityNumMap = {
             0: "10",
@@ -124,6 +139,34 @@ export default {
     },
     returnFalse() {
       return false;
+    },
+    nextLabel() {
+      let nextIndex = this.findLabelIndex() + 1;
+      window.log.info("next: ", nextIndex);
+      if (nextIndex > this.labelsData.length - 1) {
+        this.$store.commit("updateTable", "historyData");
+      } else {
+        this.$store.commit("updateTable", this.labelsData[nextIndex]._id);
+      }
+      // this.$electron.remote.getGlobal("shortcut").unregisterAltAndNumber();
+    },
+    previousLabel() {
+      let previousIndex = this.findLabelIndex() - 1;
+      window.log.info("previous: ", previousIndex);
+      if (previousIndex === -1) {
+        this.$store.commit("updateTable", "historyData");
+      } else if (previousIndex < -1) {
+        this.$store.commit(
+          "updateTable",
+          this.labelsData[this.labelsData.length - 1]._id
+        );
+      } else {
+        this.$store.commit("updateTable", this.labelsData[previousIndex]._id);
+      }
+      // this.$electron.remote.getGlobal("shortcut").unregisterAltAndNumber();
+    },
+    findLabelIndex() {
+      return this.labelsData.findIndex(element => element._id === this.table);
     }
   }
 };

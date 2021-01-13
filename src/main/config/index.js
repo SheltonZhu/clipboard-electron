@@ -18,7 +18,7 @@ if (isDevelopment) {
 config.set("isDevelopment", isDevelopment);
 config.set(
   "helpInfo",
-  "【Esc】: 隐藏剪切板\n【Alt+V】: 呼出剪贴板\n【Enter】: 粘贴选中\n【→】: 选中下一个\n【←】: 选中上一个"
+  "【Esc】: 隐藏剪切板\n【Alt+V】: 呼出剪贴板\n【Enter】: 粘贴选中\n【→】: 选中下一个\n【←】: 选中上一个\n【Alt+[】: 切换为上一个标签\n【Alt+]】: 切换为下一个标签"
 );
 config.set("github", pkg.github);
 config.set(
@@ -40,7 +40,8 @@ let initKeyMap = {
   hideWhenBlur: true,
   trayIcon: true,
   historyCapacity: 1,
-  historyCapacityNum: 50
+  historyCapacityNum: 50,
+  iconEnable: true
 };
 for (let key in initKeyMap) {
   if (config.get(key, undefined) === undefined)

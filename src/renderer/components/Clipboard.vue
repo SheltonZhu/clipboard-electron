@@ -11,7 +11,10 @@
         :key="data._id"
         :data="data"
         :table="table"
+        :cardIcons="cardIcons"
         :data-index="index"
+        :index="index"
+        :ref="'cc' + index"
       />
     </my-velocity-transition>
     <div v-if="isEmpty">
@@ -31,14 +34,15 @@ export default {
       default: "historyData"
     },
     clipboardData: {
-      type: Array,
-      default: () => []
+      type: Array
     }
   },
   name: "Clipboard",
   components: { ClipboardCard, MyVelocityTransition },
   data: () => {
-    return {};
+    return {
+      cardIcons: []
+    };
   },
   mounted() {
     this.$nextTick(() => {
@@ -61,12 +65,49 @@ export default {
         "clipboard-image-changed",
         this.insertOneData
       );
+      this.initCardIcon();
+      this.initShortcut();
+    },
+    initShortcut() {
+      let template = [];
+      for (let index in [...Array(9)]) {
+        let shortcut = parseInt(index) + 1;
+        template.push({
+          label: `Alt+${shortcut}`,
+          accelerator: `Alt+${shortcut}`,
+          click: () => {
+            try {
+              this.$refs[`cc${index}`][0].copyPasteAndHide();
+            } catch (e) {
+              if (!(e instanceof TypeError)) {
+                window.log.error(e);
+              }
+            }
+          }
+        });
+      }
+      const Menu = this.$electron.remote.Menu;
+      let menu = Menu.buildFromTemplate(template);
+      this.$electron.remote.getCurrentWindow().setMenu(menu);
+    },
+    initCardIcon() {
+      this.$electron.remote
+        .getGlobal("cardIconDb")
+        .readAll()
+        .then(cardIcons => {
+          window.log.info("icon num: ", cardIcons.length);
+          this.cardIcons = cardIcons;
+        });
     },
     onMouseWheel(e) {
       e.preventDefault();
       this.$refs.clipboard.scrollLeft += parseInt(e.deltaY);
     },
-    insertOneData(event, data) {
+    insertOneData(event, args) {
+      let data = args.data;
+      let isExist = args.isExist;
+      if (!isExist) this.initCardIcon();
+
       if (this.table === "historyData") {
         if (this.query) {
           if (data.copyType === "Image") {

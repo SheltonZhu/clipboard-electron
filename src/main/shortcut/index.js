@@ -24,4 +24,12 @@ export default class GlobalShortcut {
   static unregisterEsc() {
     globalShortcut.unregister("Esc");
   }
+
+  static unregisterAltAnd219() {
+    globalShortcut.unregister("Alt+[");
+  }
+
+  static unregisterAltAnd221() {
+    globalShortcut.unregister("Alt+]");
+  }
 }

@@ -74,19 +74,23 @@ export default class AppTray {
   }
 
   showVersionInfo() {
-    dialog.showMessageBox({
-      title: "Electron Clipboard",
-      message: "Electron Clipboard",
-      detail: config.get("about")
-    });
+    dialog
+      .showMessageBox({
+        title: "Electron Clipboard",
+        message: "Electron Clipboard",
+        detail: config.get("about")
+      })
+      .then(() => {});
   }
 
   showHelp() {
-    dialog.showMessageBox({
-      title: "使用手册",
-      message: "使用手册",
-      detail: config.get("helpInfo")
-    });
+    dialog
+      .showMessageBox({
+        title: "使用手册",
+        message: "使用手册",
+        detail: config.get("helpInfo")
+      })
+      .then(() => {});
   }
 
   quitApp() {
