@@ -24,19 +24,14 @@ export default class SettingsWindow {
         },
         width: 800,
         height: 400,
-        // minWeight: 600,
-        // minHeight: 600,
-        // backgroundColor: "#00000000",
-        // transparent: true,
-        // frame: false,
-        // minimizable: false,
-        // closable: false,
+        backgroundColor: "#fff",
+        fullscreenable: false,
+        frame: false,
         maximizable: false,
         resizable: false,
         useContentSize: true,
         autoHideMenuBar: true,
         hasShadow: true,
-        skipTaskbar: true,
         vibrancy: "light", //macos
         icon: path.join(__static, "icon.png"),
         title: "Settings",
@@ -45,7 +40,7 @@ export default class SettingsWindow {
       };
 
       this.browserWindow = new BrowserWindow(browserOptions);
-
+      this.browserWindow.setThumbarButtons([]);
       if (this.SERVER_URL) {
         // Load the url of the dev server if in development mode
         await this.browserWindow.loadURL(this.SERVER_URL + "settings");

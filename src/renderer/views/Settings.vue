@@ -1,6 +1,8 @@
 <template>
   <div id="settings">
-    <div class="title-bar"></div>
+    <div class="title-bar" style="-webkit-app-region: drag">
+      <title-bar />
+    </div>
     <div class="content">
       <el-tabs type="border-card">
         <!--    个性化    -->
@@ -191,8 +193,10 @@
 </template>
 
 <script>
+import TitleBar from "@/renderer/components/TitleBar";
 export default {
   name: "Settings",
+  components: { TitleBar },
   data: () => {
     return {
       bgBlur: true,
@@ -348,6 +352,39 @@ export default {
   padding: 2px 20px;
 }
 #settings {
-  background: #3b3a3a;
+  background: #fff;
+}
+.fake-title-bar {
+  background: #d6d0d5;
+  padding: 2px 0;
+}
+
+.el-tabs {
+  box-shadow: none;
+  border: none;
+}
+</style>
+<style>
+body {
+  margin: 0 !important;
+  background: #eae9ea;
+}
+.el-tabs__content {
+  background: #eae9ea !important;
+}
+.el-tabs .el-tabs__header {
+  background: #d6d0d5 !important;
+  border-bottom: 1px solid #b5b1b5 !important;
+}
+.el-tabs--border-card > .el-tabs__header .el-tabs__item {
+  color: #000 !important;
+  border-left: #b8b6ba !important;
+  border-right: #b8b6ba !important;
+}
+.el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
+  color: #000 !important;
+  background-color: #b8b6ba !important;
+  border-left: #b8b6ba !important;
+  border-right: #b8b6ba !important;
 }
 </style>
