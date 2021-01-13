@@ -49,7 +49,17 @@
       </el-link>
       <img v-if="isImage" :src="data.copyContent" />
     </div>
-    <div class="other-info">{{ formattedOtherInfo }}</div>
+    <div class="other-info">
+      <div class="shortcut">
+        {{ shortcut }}
+      </div>
+      <div class="info">
+        {{ formattedOtherInfo }}
+      </div>
+      <div class="other">
+        {{ shortcut }}
+      </div>
+    </div>
   </el-card>
 </template>
 <script>
@@ -65,6 +75,9 @@ export default {
     table: {
       type: String,
       default: ""
+    },
+    index: {
+      type: Number
     },
     cardIcons: {
       type: Array,
@@ -84,6 +97,10 @@ export default {
   },
   computed: {
     ...mapState(["labelsData", "iconEnable"]),
+    shortcut() {
+      if (this.index < 9) return `Alt+${this.index + 1}`;
+      return "";
+    },
     isText() {
       return this.data.copyType === "Text";
     },
@@ -160,7 +177,9 @@ export default {
     write2clipboardAndPaste() {
       this.write2clipboard();
       if (this.$electron.remote.getGlobal("config").get("directPaste"))
-        this.$electron.remote.getGlobal("robot").keyTap("v", "control");
+        setTimeout(async () => {
+          this.$electron.remote.getGlobal("robot").keyTap("v", "control");
+        }, 10);
     },
     openLink() {
       this.hideMainWindow();
@@ -398,14 +417,14 @@ export default {
 }
 
 .box-card .card-text {
-  height: 270px;
+  height: 285px;
   overflow: hidden;
   white-space: normal;
   word-break: break-all;
 }
 
 .box-card .card-text img {
-  max-height: 270px;
+  max-height: 285px;
   max-width: 300px;
 }
 
@@ -421,7 +440,23 @@ export default {
 .box-card .other-info {
   color: #dbdbdb;
   font-size: smaller;
-  margin-top: 4px;
+  margin-top: 1px;
+  text-align: center;
+}
+
+.box-card .other-info .info {
+  display: inline-block;
+}
+.box-card .other-info .shortcut {
+  float: left;
+  display: inline-block;
+  margin-top: 1px;
+}
+.box-card .other-info .other {
+  float: right;
+  display: inline-block;
+  margin-top: 1px;
+  visibility: hidden;
 }
 
 .box-card {

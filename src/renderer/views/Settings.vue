@@ -169,6 +169,16 @@
             </el-col>
           </el-row>
           <el-row class="row">
+            <el-col
+              class="warn-info"
+              :offset="8"
+              :span="16"
+              v-if="historyCapacity === 4"
+            >
+              ⚠设置为无限会使用更多的存储，进而导致卡顿⚠
+            </el-col>
+          </el-row>
+          <el-row class="row">
             <el-col :offset="8" :span="16">
               <div>
                 <el-button class="clear-history" @click="clearHistory">
@@ -181,11 +191,11 @@
 
         <el-tab-pane>
           <span slot="label"><i class="el-icon-position"></i> 快捷键 </span>
-          快捷键
+          <div style="text-align: center">开发中</div>
         </el-tab-pane>
         <el-tab-pane>
           <span slot="label"><i class="el-icon-s-marketing"></i> 规则 </span>
-          规则
+          <div style="text-align: center">开发中</div>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -363,6 +373,9 @@ export default {
   box-shadow: none;
   border: none;
 }
+.warn-info {
+  color: #ffc259;
+}
 </style>
 <style>
 body {
@@ -386,5 +399,9 @@ body {
   background-color: #b8b6ba !important;
   border-left: #b8b6ba !important;
   border-right: #b8b6ba !important;
+}
+.el-tabs__nav {
+  left: 50%;
+  transform: translateX(-50%) !important;
 }
 </style>

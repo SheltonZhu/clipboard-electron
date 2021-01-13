@@ -1,10 +1,10 @@
 "use strict";
 import {
   app,
-  protocol,
-  ipcMain,
   BrowserWindow,
+  ipcMain,
   nativeImage,
+  protocol,
   screen
 } from "electron";
 import installExtension, { VUEJS_DEVTOOLS } from "electron-devtools-installer";
@@ -66,11 +66,20 @@ ipcMain.on("settings", async (event, args) => {
   }
 });
 
+let getCurrentWindowIcon = () => {
+  const window = windowManager.getActiveWindow();
+  let iconBuffer = window.getIcon(32);
+  let icon = nativeImage.createFromBuffer(iconBuffer, {
+    width: 64,
+    height: 64
+  });
+  return icon.toDataURL();
+};
+
 clipboard
   .on("text-changed", async () => {
     let currentText = clipboard.readText();
-    // let isLink = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/.test(
-    let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/.test(
+    let isLink = /^https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/.test(
       currentText.trim()
     );
     let data = {
@@ -84,20 +93,12 @@ clipboard
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
     }
+    let base64Icon = getCurrentWindowIcon();
     try {
-      const window = windowManager.getActiveWindow();
-      let iconBuffer = window.getIcon(32);
-      let icon = nativeImage.createFromBuffer(iconBuffer, {
-        width: 64,
-        height: 64
-      });
-      let base64Icon = icon.toDataURL();
-
       let isExist;
       [data.checksum, isExist] = await cardIconDb.getChecksumAndExist(
         base64Icon
       );
-      log.info("icon exist? ", isExist);
       if (!isExist)
         await cardIconDb.create({
           content: base64Icon,
@@ -123,18 +124,11 @@ clipboard
       otherInfo: currentIMage.getSize()
     };
     try {
-      const window = windowManager.getActiveWindow();
-      let iconBuffer = window.getIcon(32);
-      let icon = nativeImage.createFromBuffer(iconBuffer, {
-        width: 64,
-        height: 64
-      });
-      let base64Icon = icon.toDataURL();
+      let base64Icon = getCurrentWindowIcon();
       let isExist;
       [image.checksum, isExist] = await cardIconDb.getChecksumAndExist(
         base64Icon
       );
-      log.info("icon exist? ", isExist);
       if (!isExist)
         await cardIconDb.create({
           content: base64Icon,

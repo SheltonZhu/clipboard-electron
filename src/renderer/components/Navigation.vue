@@ -272,7 +272,7 @@ export default {
       if (this.selectType) {
         this.selectType = "";
       } else {
-        this.execSearch();
+        this.execSearchDebounce();
       }
     },
     changeSearchType() {
