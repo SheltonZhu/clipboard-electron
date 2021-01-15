@@ -62,15 +62,12 @@
           </el-button>
         </el-tooltip>
 
-        <my-velocity-transition>
-          <favorite-label
-            :is-searching="isSearching"
-            v-for="labelData in labels"
-            :key="labelData._id"
-            :label-data="labelData"
-          />
-        </my-velocity-transition>
-
+        <favorite-label
+          :is-searching="isSearching"
+          v-for="labelData in labels"
+          :key="labelData._id"
+          :label-data="labelData"
+        />
         <!--    添加新标签按钮    -->
         <div v-if="newLabelVisible">
           <el-button
@@ -132,12 +129,14 @@
 <script>
 import Spot from "@/renderer/components/Spot";
 import FavoriteLabel from "@/renderer/components/FavoriteLabel";
-import MyVelocityTransition from "@/renderer/components/MyVelocityTransition";
 import { mapState } from "vuex";
 
 export default {
   name: "Navigation",
-  components: { Spot, FavoriteLabel, MyVelocityTransition },
+  components: {
+    Spot,
+    FavoriteLabel
+  },
   data: () => {
     return {
       activeIndex: "/",

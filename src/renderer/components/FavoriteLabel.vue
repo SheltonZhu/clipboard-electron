@@ -116,8 +116,8 @@ export default {
     },
     removeLabel() {
       //加了动画多了一个parenet
-      this.$parent.$parent.$parent.doRemoveLabel(this.labelData);
-      // this.$parent.doRemoveLabel(this.labelData);
+      // this.$parent.$parent.$parent.doRemoveLabel(this.labelData);
+      this.$parent.doRemoveLabel(this.labelData);
     },
     onRenameLabel() {
       this.isRenaming = true;
