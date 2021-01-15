@@ -27,7 +27,7 @@
             <p class="type">{{ data["name"] || data.copyType }}</p>
           </div>
           <div class="time">
-            <p class="time">{{ new Date(data.copyTime) | moment("from") }}</p>
+            <p class="time">{{ $date(data.copyTime).fromNow() }}</p>
           </div>
         </div>
 
@@ -313,7 +313,7 @@ export default {
         {
           label: "快速查看（TODO）",
           icon: "el-icon-view",
-          hidden: this.isLink
+          hidden: true
         },
         {
           label: "添加到收藏",
