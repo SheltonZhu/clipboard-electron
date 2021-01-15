@@ -92,6 +92,11 @@ clipboard
     if (isLink) {
       data.copyType = "Link";
       data.copyContent = data.copyContent.trim();
+    } else {
+      let regexList = config.get("regexList");
+      for (let regex of regexList) {
+        if (new RegExp(regex).test(data.copyContent)) return;
+      }
     }
     let base64Icon = getCurrentWindowIcon();
     try {
@@ -157,8 +162,10 @@ app
       }
     }
     try {
-      await db.initData();
-      await labelDb.initData();
+      if (isDevelopment) {
+        await db.initData();
+        await labelDb.initData();
+      }
     } catch (e) {
       mainLog.error("init database fail: ", e.toString());
     }

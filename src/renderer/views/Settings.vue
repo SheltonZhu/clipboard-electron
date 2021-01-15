@@ -243,14 +243,19 @@
           <span slot="label"><i class="el-icon-s-marketing"></i> 规则 </span>
           <div style="text-align: center">
             自定义关键字（正则）
-            <div>
-              <p>
-                account
-              </p>
+            <div
+              style="background: #fff;height: 265px;overflow-y: scroll;margin: 10px 0;"
+            >
+              <regex-input
+                v-for="(regex, idx) in regexList"
+                :key="idx"
+                :index="idx"
+                :data="regex"
+              >
+              </regex-input>
             </div>
             <div>
-              <el-button class="el-icon-plus"></el-button>
-              <el-button class="el-icon-minus"></el-button>
+              <el-button @click="addRegex" class="el-icon-plus"></el-button>
             </div>
           </div>
         </el-tab-pane>
@@ -261,9 +266,10 @@
 
 <script>
 import TitleBar from "@/renderer/components/TitleBar";
+import RegexInput from "@/renderer/components/RegexInput";
 export default {
   name: "Settings",
-  components: { TitleBar },
+  components: { TitleBar, RegexInput },
   data: () => {
     return {
       bgBlur: true,
@@ -289,7 +295,8 @@ export default {
       iconEnable: true,
       historyCapacity: 1,
       activeColor: "#15bbf9",
-      inactiveColor: "#aaabab"
+      inactiveColor: "#aaabab",
+      regexList: []
     };
   },
   mounted() {
@@ -351,6 +358,12 @@ export default {
         key: "iconEnable",
         value: this.iconEnable
       });
+    },
+    regexList() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "regexList",
+        value: this.regexList
+      });
     }
   },
   methods: {
@@ -367,6 +380,7 @@ export default {
       this.hideWhenBlur = config.get("hideWhenBlur");
       this.iconEnable = config.get("iconEnable");
       this.historyCapacity = config.get("historyCapacity");
+      this.regexList = config.get("regexList");
     },
     changeNum() {
       this.$electron.ipcRenderer.send("settings", {
@@ -394,6 +408,9 @@ export default {
         .finally(() => {
           this.$electron.remote.getGlobal("shortcut").registerEsc();
         });
+    },
+    addRegex() {
+      this.regexList.unshift("新规则");
     }
   }
 };

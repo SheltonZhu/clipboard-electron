@@ -42,7 +42,8 @@ let initKeyMap = {
   trayIcon: true,
   historyCapacity: 1,
   historyCapacityNum: 50,
-  iconEnable: true
+  iconEnable: true,
+  regexList: []
 };
 for (let key in initKeyMap) {
   if (config.get(key, undefined) === undefined)
