@@ -41,13 +41,15 @@
           <el-row v-if="bgPic">
             <el-col :offset="12">
               <!--       背景图       -->
-              <div>
+              <div class="bg-image-container">
                 <el-image
+                  :class="{ 'bg-selected': src === imageUrl }"
+                  class="bg-image"
                   v-for="(src, idx) in bgList"
                   :key="idx"
                   :src="src"
                   fit="cover"
-                  style="width: 96px;height: 54px"
+                  @click="selectBg"
                 ></el-image>
               </div>
             </el-col>
@@ -266,7 +268,7 @@ export default {
     return {
       bgBlur: true,
       bgPic: true,
-      bgList: ["/bg/default.png"],
+      bgList: [],
       bgColor: "rgba(255, 255, 255, 0.72)",
       predefineColors: [
         "rgba(255, 255, 255, 0.72)",
@@ -282,6 +284,7 @@ export default {
       autoBoot: false,
       directPaste: true,
       hideWhenBlur: false,
+      imageUrl: "/bg/default.png",
       trayIcon: true,
       iconEnable: true,
       historyCapacity: 1,
@@ -305,6 +308,12 @@ export default {
       this.$electron.ipcRenderer.send("settings", {
         key: "bgPic",
         value: this.bgPic
+      });
+    },
+    imageUrl() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "imageUrl",
+        value: this.imageUrl
       });
     },
     bgColor() {
@@ -349,6 +358,8 @@ export default {
       const config = this.$electron.remote.getGlobal("config");
       this.bgBlur = config.get("bgBlur");
       this.bgPic = config.get("bgPic");
+      this.imageUrl = config.get("imageUrl");
+      this.bgList = config.get("bgList");
       this.bgColor = config.get("bgColor");
       this.autoBoot = config.get("autoBoot");
       this.directPaste = config.get("directPaste");
@@ -362,6 +373,9 @@ export default {
         key: "historyCapacity",
         value: this.historyCapacity
       });
+    },
+    selectBg(e) {
+      this.imageUrl = "/bg/" + e.target.src.split("/").pop();
     },
     clearHistory() {
       this.$electron.remote.getGlobal("shortcut").unregisterEsc();
@@ -463,5 +477,19 @@ body {
 }
 .switch .el-slider {
   margin: 0 10px;
+}
+.bg-image-container {
+  display: flex;
+  flex-direction: column;
+}
+.bg-image {
+  flex: 1;
+  margin-right: 5px;
+  border: 2px solid #ffffff00;
+  width: 160px;
+  height: 50px;
+}
+.bg-selected {
+  border: 2px solid #409eff;
 }
 </style>

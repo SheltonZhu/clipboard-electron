@@ -25,7 +25,7 @@ config.set(
   "about",
   `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub: ${pkg.github}\nDescription: ${pkg.description}`
 );
-
+config.set("bgList", ["/bg/default.png", "/bg/bg1.png", "/bg/bg2.png"]);
 let initKeyMap = {
   logLevel: "error",
   initCopyContent: "Thank you for using!!!!",
@@ -33,6 +33,7 @@ let initKeyMap = {
   defaultIcon: "/default_icon.png",
   bgBlur: true,
   bgPic: true,
+  imageUrl: "/bg/default.png",
   defaultBg: "/bg/default.png",
   bgColor: "#ffffffbf",
   autoBoot: false,

@@ -175,7 +175,7 @@ app
     }
 
     try {
-      new AutoUpdater();
+      if (isDevelopment) new AutoUpdater();
     } catch (e) {
       mainLog.error("init auto updater fail: ", e.toString());
     }
@@ -229,4 +229,4 @@ if (isDevelopment) {
   }
 }
 mainLog.info("configPath: ", config.file());
-mainLog.info("loggPath: ", log.transports.file.getFile().path);
+mainLog.info("logPath: ", log.transports.file.getFile().path);

@@ -110,8 +110,9 @@ export default {
           this[args.key] = args.value;
         }
       });
-      this.bgPic = config.get("bgPic");
       this.bgBlur = config.get("bgBlur");
+      this.bgPic = config.get("bgPic");
+      this.imageUrl = config.get("imageUrl");
       this.bgColor = config.get("bgColor");
       this.defaultBg = config.get("defaultBg");
     },
