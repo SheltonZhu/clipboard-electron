@@ -467,6 +467,7 @@ export default {
   outline: none;
 }
 
+/*.box-card:hover,*/
 .box-card:focus {
   border: 5px solid #2480fc;
 }

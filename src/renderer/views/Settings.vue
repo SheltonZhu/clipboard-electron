@@ -237,6 +237,14 @@
                 + 1..9
               </el-col>
             </el-row>
+            <el-row class="row">
+              <el-col :span="12">
+                <div class="type">搜索</div>
+              </el-col>
+              <el-col :span="12" class="shortcut">
+                Alt + S
+              </el-col>
+            </el-row>
           </div>
         </el-tab-pane>
         <el-tab-pane>
