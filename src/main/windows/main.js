@@ -80,6 +80,7 @@ export default class MainWindow {
       GlobalShortcut.unregisterEsc();
       GlobalShortcut.unregisterAltAnd219();
       GlobalShortcut.unregisterAltAnd221();
+      GlobalShortcut.unregisterAltAndS();
     });
     if (config.get("hideWhenBlur"))
       this.browserWindow.on("blur", this.browserWindow.hide);

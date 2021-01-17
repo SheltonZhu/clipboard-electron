@@ -38,6 +38,7 @@
         <el-button
           v-if="!isSearching"
           @click="clickSearchBtn"
+          ref="searchBtn"
           class="el-icon-search search-btn"
         ></el-button>
       </transition>
@@ -151,6 +152,7 @@ export default {
   },
   mounted() {
     this.initLabels();
+    this.initShortCut();
     this.delay = this.Debounce();
   },
   watch: {
@@ -177,6 +179,19 @@ export default {
           this.$store.commit("updateLabelsData", this.labels);
         });
     },
+    initShortCut() {
+      this.$electron.remote.getCurrentWindow().on("show", () => {
+        this.$electron.remote.globalShortcut.register("Alt+S", () => {
+          if (!this.isSearching) {
+            this.$refs.searchBtn.$el.click();
+          } else {
+            this.$refs.searchBar.focus();
+            this.$refs.searchBar.select();
+          }
+        });
+      });
+    },
+
     clickLabelAdder() {
       this.newLabelVisible = true;
       this.$nextTick(() => {

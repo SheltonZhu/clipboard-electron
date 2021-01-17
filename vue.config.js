@@ -26,12 +26,7 @@ module.exports = {
       preload: "src/preload.js",
       builderOptions: {
         // options placed here will be merged with default configuration and passed to electron-builder
-        publish: [
-          {
-            provider: "github",
-            repo: pkg.github
-          }
-        ],
+        publish: ["github"],
         // asar: false, // 是否使用 asar 壓縮檔案
         // appId: "myappid.id" + env, // 認證的 appId
         productName: pkg.productName + env,
@@ -61,6 +56,7 @@ module.exports = {
           icon: "build/icons/icon.icns"
         },
         nsis: {
+          artifactName: "${productName}-Setup-${version}.${ext}",
           oneClick: false, // 一键安装
           installerIcon: "build/icons/icon.ico",
           uninstallerIcon: "build/icons/icon.ico",

@@ -43,6 +43,13 @@ export default {
       cardIcons: []
     };
   },
+  watch: {
+    table() {
+      this.$nextTick(() => {
+        setTimeout(this.focusFirst, 200);
+      });
+    }
+  },
   mounted() {
     this.$nextTick(() => {
       this.init();
@@ -66,6 +73,7 @@ export default {
       );
       this.initCardIcon();
       this.initShortcut();
+      this.initFocus();
     },
     initShortcut() {
       let template = [];
@@ -97,6 +105,18 @@ export default {
           window.log.info("icon num: ", cardIcons.length);
           this.cardIcons = cardIcons;
         });
+    },
+    initFocus() {
+      this.$electron.remote.getCurrentWindow().on("show", this.focusFirst);
+    },
+    focusFirst() {
+      try {
+        this.$refs[`cc0`][0].$el.focus();
+      } catch (e) {
+        if (!(e instanceof TypeError)) {
+          window.log.error(e);
+        }
+      }
     },
     onMouseWheel(e) {
       e.preventDefault();

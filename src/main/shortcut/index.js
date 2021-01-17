@@ -32,4 +32,8 @@ export default class GlobalShortcut {
   static unregisterAltAnd221() {
     globalShortcut.unregister("Alt+]");
   }
+
+  static unregisterAltAndS() {
+    globalShortcut.unregister("Alt+S");
+  }
 }
