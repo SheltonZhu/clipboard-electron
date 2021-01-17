@@ -23,7 +23,7 @@ export default class SettingsWindow {
           preload: path.join(__dirname, "preload.js")
         },
         width: 600,
-        height: 450,
+        height: 500,
         backgroundColor: "#fff",
         fullscreenable: false,
         frame: false,

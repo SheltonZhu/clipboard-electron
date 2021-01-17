@@ -12,6 +12,7 @@
     >
       <el-button
         :class="{ 'is-selected': isSelected }"
+        :style="{ color: labelFontColor }"
         @click="onLabelClick"
         @contextmenu.native="onContextmenu"
         ref="dragBtn"
@@ -62,6 +63,10 @@ export default {
     isSearching: {
       type: Boolean,
       default: false
+    },
+    labelFontColor: {
+      type: String,
+      default: "#2c3e50"
     }
   },
   components: {

@@ -54,7 +54,7 @@
               </div>
             </el-col>
           </el-row>
-          <el-row class="row">
+          <el-row class="row vertically-center">
             <el-col :span="12">
               <div class="type">背景颜色</div>
             </el-col>
@@ -64,6 +64,22 @@
                   v-model="bgColor"
                   show-alpha
                   :predefine="predefineColors"
+                >
+                </el-color-picker>
+              </div>
+            </el-col>
+          </el-row>
+
+          <el-row class="row vertically-center">
+            <el-col :span="12">
+              <div class="type">标签字体颜色</div>
+            </el-col>
+            <el-col :span="12">
+              <div class="switch">
+                <el-color-picker
+                  v-model="labelFontColor"
+                  show-alpha
+                  :predefine="predefineLabelFontColors"
                 >
                 </el-color-picker>
               </div>
@@ -150,9 +166,9 @@
               </div>
             </el-col>
           </el-row>
-          <el-row class="row">
+          <el-row class="row vertically-center">
             <el-col :span="12">
-              <div class="type" style="margin-top: 15px;">历史记录容量</div>
+              <div class="type">历史记录容量</div>
             </el-col>
             <el-col :span="12">
               <div class="switch">
@@ -191,6 +207,7 @@
           </el-row>
         </el-tab-pane>
 
+        <!--    快捷键    -->
         <el-tab-pane>
           <span slot="label"><i class="el-icon-position"></i> 快捷键 </span>
           <div style="text-align: center">
@@ -247,12 +264,14 @@
             </el-row>
           </div>
         </el-tab-pane>
+
+        <!--    规则    -->
         <el-tab-pane>
           <span slot="label"><i class="el-icon-s-marketing"></i> 规则 </span>
           <div style="text-align: center">
             自定义关键字（正则）
             <div
-              style="background: #fff;height: 265px;overflow-y: scroll;margin: 10px 0;"
+              style="background: #fff;height: 300px;overflow-y: scroll;margin: 10px 0;"
             >
               <regex-input
                 v-for="(regex, idx) in regexList"
@@ -267,14 +286,17 @@
             </div>
           </div>
         </el-tab-pane>
+
+        <!--    关于    -->
         <el-tab-pane>
           <span slot="label"><i class="el-icon-info"></i> 关于 </span>
           <div style="text-align: center">
             <el-row class="row" style="display:flex;align-items:center;">
               <el-image
                 src="/default_icon.png"
+                @click="openGithub"
                 fit="center"
-                style="margin: 0px 20px 10px 50px;"
+                style="margin: 0px 20px 10px 50px;cursor: pointer"
               />
               <div style="font-size: 30px;font-weight: bold">{{ appName }}</div>
               <div style="margin: 10px 0 0 10px;">{{ appVersion }}</div>
@@ -325,6 +347,16 @@ export default {
         "rgb(255, 120, 0)",
         "hsl(181, 100%, 37%)",
         "rgba(250, 212, 0, 1)"
+      ],
+      labelFontColor: "rgba(44, 62, 80, 1)",
+      predefineLabelFontColors: [
+        "#2c3e50",
+        "#fff",
+        "#000",
+        "rgba(99, 145, 230, 1)",
+        "rgba(249, 252, 44, 1)",
+        "rgba(239, 38, 85, 1)",
+        "rgba(202, 38, 239, 1)"
       ],
       autoBoot: false,
       directPaste: true,
@@ -385,6 +417,12 @@ export default {
         value: this.bgColor
       });
     },
+    labelFontColor() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "labelFontColor",
+        value: this.labelFontColor
+      });
+    },
     autoBoot() {
       this.$electron.ipcRenderer.send("settings", {
         key: "autoBoot",
@@ -430,6 +468,7 @@ export default {
       this.imageUrl = config.get("imageUrl");
       this.bgList = config.get("bgList");
       this.bgColor = config.get("bgColor");
+      this.labelFontColor = config.get("labelFontColor");
       this.autoBoot = config.get("autoBoot");
       this.directPaste = config.get("directPaste");
       this.trayIcon = config.get("trayIcon");
@@ -476,6 +515,11 @@ export default {
     downloadNewVersion() {
       if (this.downloadUrl)
         this.$electron.remote.shell.openExternal(this.downloadUrl);
+    },
+    openGithub() {
+      this.$electron.remote.shell.openExternal(
+        this.$electron.remote.getGlobal("config").get("github")
+      );
     }
   }
 };
@@ -590,5 +634,10 @@ body {
 
 .bg-selected {
   border: 2px solid #409eff;
+}
+
+.vertically-center {
+  display: flex;
+  align-items: center;
 }
 </style>

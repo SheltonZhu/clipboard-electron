@@ -17,7 +17,7 @@
       }"
     >
       <el-header>
-        <navigation />
+        <navigation :labelFontColor="labelFontColor" />
       </el-header>
       <el-main>
         <clipboard :table="table" :clipboardData="this.clipboardData" />
@@ -45,7 +45,8 @@ export default {
       bgBlur: true,
       bgColor: "#ffffffbf",
       defaultBg: "/bg/default.png",
-      imageUrl: "/bg/default.png"
+      imageUrl: "/bg/default.png",
+      labelFontColor: "#2c3e50"
     };
   },
   methods: {

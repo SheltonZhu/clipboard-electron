@@ -40,6 +40,7 @@
           @click="clickSearchBtn"
           ref="searchBtn"
           class="el-icon-search search-btn"
+          :style="{ color: labelFontColor }"
         ></el-button>
       </transition>
 
@@ -49,6 +50,7 @@
         <el-tooltip :disabled="!isSearching" content="剪贴板历史">
           <el-button
             :class="{ 'is-selected': isSelected }"
+            :style="{ color: labelFontColor }"
             @click="mainLabelClick"
           >
             <spot color="#aaabab" />
@@ -65,6 +67,7 @@
 
         <favorite-label
           :is-searching="isSearching"
+          :labelFontColor="labelFontColor"
           v-for="labelData in labels"
           :key="labelData._id"
           :label-data="labelData"
@@ -92,12 +95,16 @@
       <el-button
         v-if="!isSearching"
         class="el-icon-plus add-btn"
+        :style="{ color: labelFontColor }"
         @click="clickLabelAdder"
       ></el-button>
 
       <!--   more按钮   -->
       <el-dropdown style="float: right;cursor: pointer" trigger="click">
-        <el-button class="el-dropdown-link el-icon-more-outline more-btn">
+        <el-button
+          :style="{ color: labelFontColor }"
+          class="el-dropdown-link el-icon-more-outline more-btn"
+        >
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <!--          <el-dropdown-item icon="el-icon-delete" @click.native="clearClipboard"-->
@@ -137,6 +144,12 @@ export default {
   components: {
     Spot,
     FavoriteLabel
+  },
+  props: {
+    labelFontColor: {
+      type: String,
+      default: "#2c3e50"
+    }
   },
   data: () => {
     return {
@@ -404,7 +417,7 @@ export default {
 </style>
 <style>
 .nav .el-button {
-  color: #2c3e50 !important;
+  /*color: #2c3e50 !important;*/
   background: #ffffff00 !important;
   font-weight: bold !important;
   padding: 8px 10px !important;

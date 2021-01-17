@@ -36,6 +36,7 @@ let initKeyMap = {
   imageUrl: "/bg/default.png",
   defaultBg: "/bg/default.png",
   bgColor: "#ffffffbf",
+  labelFontColor: "#2c3e50",
   autoBoot: false,
   directPaste: true,
   hideWhenBlur: true,
