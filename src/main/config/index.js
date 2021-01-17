@@ -25,7 +25,6 @@ config.set(
   "about",
   `Version: ${pkg.version}\nAuthor: ${pkg.author}\nGithub: ${pkg.repository.url}\nDescription: ${pkg.description}`
 );
-config.set("bgList", ["/bg/default.png", "/bg/bg1.png", "/bg/bg2.png"]);
 let initKeyMap = {
   logLevel: "error",
   initCopyContent: "Thank you for using!!!!",
@@ -35,7 +34,11 @@ let initKeyMap = {
   bgPic: true,
   imageUrl: "/bg/default.png",
   defaultBg: "/bg/default.png",
+  bgList: ["/bg/default.png", "/bg/bg1.png", "/bg/bg2.png"],
   bgColor: "#ffffffbf",
+  labelFontColor: "#2c3e50",
+  labelFontColorSelect: "#fff",
+  labelBgColorSelect: "#b9b9b9d1",
   autoBoot: false,
   directPaste: true,
   hideWhenBlur: true,

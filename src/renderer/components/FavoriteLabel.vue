@@ -1,7 +1,7 @@
 <template>
   <span
     :class="{ 'is-droppable': isDroppable }"
-    @drop="onCardDrop"
+    @drop.prevent="onCardDrop"
     @dragenter="onCardDragIn"
     @dragleave="onCardDragOut"
   >
@@ -11,7 +11,15 @@
       :content="labelData.name"
     >
       <el-button
-        :class="{ 'is-selected': isSelected }"
+        :style="{
+          color: labelFontColor,
+          color: isSelected
+            ? labelFontColorSelect + '!important'
+            : labelFontColor,
+          background: isSelected ? labelBgColorSelect + '!important' : 'none',
+          '--labelFontColorSelect': labelFontColorSelect,
+          '--labelBgColorSelect': labelBgColorSelect
+        }"
         @click="onLabelClick"
         @contextmenu.native="onContextmenu"
         ref="dragBtn"
@@ -30,8 +38,14 @@
     <!--  改名字  -->
     <div v-if="isRenaming" style="display: inline-block">
       <el-button
-        class="add-box is-selected"
-        style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
+        class="add-box"
+        :style="{
+          color: labelFontColorSelect + '!important',
+          background: labelBgColorSelect + '!important',
+          'padding-top': '0 !important',
+          'padding-bottom': '0 !important',
+          border: 'none !important'
+        }"
       >
         <spot :color="labelData.color" />
         <el-input
@@ -62,6 +76,18 @@ export default {
     isSearching: {
       type: Boolean,
       default: false
+    },
+    labelFontColor: {
+      type: String,
+      default: "#2c3e50"
+    },
+    labelFontColorSelect: {
+      type: String,
+      default: "#fff"
+    },
+    labelBgColorSelect: {
+      type: String,
+      default: "#b9b9b9d1"
     }
   },
   components: {
@@ -88,6 +114,7 @@ export default {
   },
   methods: {
     onCardDrop() {
+      window.log.info("drop");
       if (this.labelData._id !== this.dragData.table) {
         let newData = Object.assign({}, this.dragData);
         newData.table = this.labelData._id;
@@ -102,12 +129,14 @@ export default {
       this.isDroppable = false;
     },
     onCardDragIn(e) {
+      window.log.info("in");
       this.dragEl = e.target;
       if (this.labelData._id !== this.dragData.table) {
         this.isDroppable = true;
       }
     },
     onCardDragOut(e) {
+      window.log.info("out");
       if (this.dragEl === e.target) this.isDroppable = false;
     },
     onLabelClick() {
@@ -264,7 +293,7 @@ export default {
   border-style: double;
 }
 
-.context-menu .circle-border:hover {
+.context-menu .circle-border {
   border-color: #0a98cb;
 }
 

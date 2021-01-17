@@ -131,9 +131,11 @@ export default {
   },
   methods: {
     onDragStart() {
+      window.log.info("dragStart");
       this.$store.commit("updateDragData", this.data);
     },
     onDragEnd() {
+      window.log.info("dragEnd");
       this.$store.commit("updateDragData", null);
     },
     hideMainWindow() {

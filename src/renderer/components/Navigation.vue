@@ -40,15 +40,26 @@
           @click="clickSearchBtn"
           ref="searchBtn"
           class="el-icon-search search-btn"
+          :style="{ color: labelFontColor }"
         ></el-button>
       </transition>
 
       <!--   收藏栏按钮组   -->
       <div class="clipboard-tag">
-        <!--   剪贴板历史   -->
+        <!--   剪贴板历史标签   -->
         <el-tooltip :disabled="!isSearching" content="剪贴板历史">
           <el-button
-            :class="{ 'is-selected': isSelected }"
+            :style="{
+              color: labelFontColor,
+              color: isSelected
+                ? labelFontColorSelect + '!important'
+                : labelFontColor,
+              background: isSelected
+                ? labelBgColorSelect + '!important'
+                : 'none',
+              '--labelFontColorSelect': labelFontColorSelect,
+              '--labelBgColorSelect': labelBgColorSelect
+            }"
             @click="mainLabelClick"
           >
             <spot color="#aaabab" />
@@ -65,15 +76,23 @@
 
         <favorite-label
           :is-searching="isSearching"
+          :labelFontColor="labelFontColor"
+          :labelFontColorSelect="labelFontColorSelect"
+          :labelBgColorSelect="labelBgColorSelect"
           v-for="labelData in labels"
           :key="labelData._id"
           :label-data="labelData"
         />
-        <!--    添加新标签按钮    -->
+        <!--    添加新标签输入框    -->
         <div v-if="newLabelVisible">
           <el-button
-            class="add-box is-selected"
-            style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
+            :style="{
+              color: labelFontColorSelect + '!important',
+              background: labelBgColorSelect + '!important',
+              'padding-top': '0 !important',
+              'padding-bottom': '0 !important',
+              border: 'none !important'
+            }"
           >
             <spot color="#fe9700" />
             <el-input
@@ -92,12 +111,16 @@
       <el-button
         v-if="!isSearching"
         class="el-icon-plus add-btn"
+        :style="{ color: labelFontColor }"
         @click="clickLabelAdder"
       ></el-button>
 
       <!--   more按钮   -->
       <el-dropdown style="float: right;cursor: pointer" trigger="click">
-        <el-button class="el-dropdown-link el-icon-more-outline more-btn">
+        <el-button
+          :style="{ color: labelFontColor }"
+          class="el-dropdown-link el-icon-more-outline more-btn"
+        >
         </el-button>
         <el-dropdown-menu slot="dropdown">
           <!--          <el-dropdown-item icon="el-icon-delete" @click.native="clearClipboard"-->
@@ -137,6 +160,20 @@ export default {
   components: {
     Spot,
     FavoriteLabel
+  },
+  props: {
+    labelFontColor: {
+      type: String,
+      default: "#2c3e50"
+    },
+    labelFontColorSelect: {
+      type: String,
+      default: "#fff"
+    },
+    labelBgColorSelect: {
+      type: String,
+      default: "#b9b9b9d1"
+    }
   },
   data: () => {
     return {
@@ -404,7 +441,7 @@ export default {
 </style>
 <style>
 .nav .el-button {
-  color: #2c3e50 !important;
+  /*color: #2c3e50 !important;*/
   background: #ffffff00 !important;
   font-weight: bold !important;
   padding: 8px 10px !important;
@@ -417,13 +454,8 @@ export default {
 }
 
 .clipboard-tag .el-button:hover {
-  color: #fff !important;
-  background: #b9b9b9d1 !important;
-}
-
-.clipboard-tag .is-selected {
-  color: #fff !important;
-  background: #b9b9b9d1 !important;
+  color: var(--labelFontColorSelect) !important;
+  background: var(--labelBgColorSelect) !important;
 }
 
 .el-select-dropdown {

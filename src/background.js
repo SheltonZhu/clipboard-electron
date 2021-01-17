@@ -120,13 +120,13 @@ clipboard
   })
   .on("image-changed", async () => {
     // const window = windowManager.getActiveWindow();
-    let currentIMage = clipboard.readImage();
+    let currentImage = clipboard.readImage();
     let image = {
       table: "historyData",
       copyType: "Image",
       copyTime: new Date(),
-      copyContent: currentIMage.toDataURL(),
-      otherInfo: currentIMage.getSize()
+      copyContent: currentImage.toDataURL(),
+      otherInfo: currentImage.getSize()
     };
     try {
       let base64Icon = getCurrentWindowIcon();
