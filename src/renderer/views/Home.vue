@@ -53,7 +53,7 @@ export default {
       this.initShortCut();
       this.initSettings();
       this.initData();
-      this.initFileDragEvent();
+      // this.initFileDragEvent();
     },
     initShortCut() {
       this.$electron.remote.getCurrentWindow().on("show", () => {
