@@ -41,16 +41,46 @@
           <el-row v-if="bgPic">
             <el-col :offset="12">
               <!--       背景图       -->
-              <div class="bg-image-container">
-                <el-image
-                  :class="{ 'bg-selected': src === imageUrl }"
-                  class="bg-image"
-                  v-for="(src, idx) in bgList"
-                  :key="idx"
-                  :src="src"
-                  fit="cover"
-                  @click="selectBg"
-                ></el-image>
+              <div>
+                <div class="bg-image-container">
+                  <div
+                    style="display: flex;width: 170px;align-items: center;margin-top: 5px;"
+                    v-for="(src, idx) in bgList"
+                    :key="idx"
+                  >
+                    <el-image
+                      :class="{ 'bg-selected': src === imageUrl }"
+                      class="bg-image"
+                      :src="src"
+                      fit="cover"
+                      width="160px"
+                      @click="selectBg"
+                    ></el-image>
+                    <el-button
+                      v-if="src !== imageUrl"
+                      circle
+                      style="padding: 0"
+                      class="el-icon-minus"
+                      @click="
+                        () => {
+                          removeBg(idx);
+                        }
+                      "
+                    ></el-button>
+                  </div>
+                </div>
+                <el-input
+                  style="margin-top:10px;width: 250px"
+                  placeholder="图片地址"
+                  v-model="picUrl"
+                  @keyup.enter.native="addPic"
+                >
+                  <el-button
+                    slot="append"
+                    icon="el-icon-plus"
+                    @click="addPic"
+                  ></el-button>
+                </el-input>
               </div>
             </el-col>
           </el-row>
@@ -303,7 +333,7 @@
           <div style="text-align: center">
             自定义关键字（正则）
             <div
-              style="background: #fff;height: 300px;overflow-y: scroll;margin: 10px 0;"
+              style="background: #fff;height: 400px;overflow-y: scroll;margin: 10px 0;"
             >
               <regex-input
                 v-for="(regex, idx) in regexList"
@@ -367,7 +397,8 @@ export default {
     return {
       bgBlur: true,
       bgPic: true,
-      bgList: [],
+      bgList: ["/bg/default.png", "/bg/bg1.png", "/bg/bg2.png"],
+      picUrl: "",
       bgColor: "rgba(255, 255, 255, 0.72)",
       predefineColors: [
         "rgba(255, 255, 255, 0.72)", //原版
@@ -459,6 +490,12 @@ export default {
       this.$electron.ipcRenderer.send("settings", {
         key: "bgPic",
         value: this.bgPic
+      });
+    },
+    bgList() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgList",
+        value: this.bgList
       });
     },
     imageUrl() {
@@ -595,6 +632,13 @@ export default {
       this.$electron.remote.shell.openExternal(
         this.$electron.remote.getGlobal("config").get("github")
       );
+    },
+    addPic() {
+      if (this.picUrl) this.bgList.unshift(this.picUrl);
+      this.picUrl = "";
+    },
+    removeBg(idx) {
+      this.bgList.splice(idx, 1);
     }
   }
 };
@@ -695,8 +739,9 @@ body {
 }
 
 .bg-image-container {
-  display: flex;
-  flex-direction: column;
+  max-height: 150px;
+  overflow-y: scroll;
+  width: 250px;
 }
 
 .bg-image {
