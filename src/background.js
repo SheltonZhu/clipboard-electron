@@ -182,7 +182,7 @@ app
     }
 
     try {
-      if (isDevelopment) new AutoUpdater();
+      new AutoUpdater();
     } catch (e) {
       mainLog.error("init auto updater fail: ", e.toString());
     }

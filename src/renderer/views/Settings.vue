@@ -267,6 +267,35 @@
             </div>
           </div>
         </el-tab-pane>
+        <el-tab-pane>
+          <span slot="label"><i class="el-icon-info"></i> 关于 </span>
+          <div style="text-align: center">
+            <el-row class="row" style="display:flex;align-items:center;">
+              <el-image
+                src="/default_icon.png"
+                fit="center"
+                style="margin: 0px 20px 10px 50px;"
+              />
+              <div style="font-size: 30px;font-weight: bold">{{ appName }}</div>
+              <div style="margin: 10px 0 0 10px;">{{ appVersion }}</div>
+              <el-badge
+                v-if="hasUpdate"
+                @click.native="downloadNewVersion"
+                value="new"
+                style="cursor: pointer"
+              />
+            </el-row>
+
+            <el-row class="row" v-for="(p, idx) in about" :key="idx">
+              <el-col :span="6">
+                <div class="type">{{ p.split(": ")[0] }}</div>
+              </el-col>
+              <el-col :span="18">
+                <div class="shortcut">{{ p.split(": ")[1] }}</div>
+              </el-col>
+            </el-row>
+          </div>
+        </el-tab-pane>
       </el-tabs>
     </div>
   </div>
@@ -275,6 +304,8 @@
 <script>
 import TitleBar from "@/renderer/components/TitleBar";
 import RegexInput from "@/renderer/components/RegexInput";
+import pkg from "@/../package.json";
+
 export default {
   name: "Settings",
   components: { TitleBar, RegexInput },
@@ -304,13 +335,30 @@ export default {
       historyCapacity: 1,
       activeColor: "#15bbf9",
       inactiveColor: "#aaabab",
-      regexList: []
+      regexList: [],
+      hasUpdate: false,
+      downloadUrl: ""
     };
   },
   mounted() {
     this.$nextTick(() => {
       this.init();
     });
+  },
+  computed: {
+    about() {
+      let about = this.$electron.remote
+        .getGlobal("config")
+        .get("about")
+        .split("\n");
+      return about;
+    },
+    appName() {
+      return pkg.productName;
+    },
+    appVersion() {
+      return pkg.version;
+    }
   },
   watch: {
     bgBlur() {
@@ -389,6 +437,11 @@ export default {
       this.iconEnable = config.get("iconEnable");
       this.historyCapacity = config.get("historyCapacity");
       this.regexList = config.get("regexList");
+      this.$electron.ipcRenderer.once("update", (e, url) => {
+        window.log.info("has update url: ", url);
+        this.hasUpdate = true;
+        this.downloadUrl = url;
+      });
     },
     changeNum() {
       this.$electron.ipcRenderer.send("settings", {
@@ -419,6 +472,10 @@ export default {
     },
     addRegex() {
       this.regexList.unshift("新规则");
+    },
+    downloadNewVersion() {
+      if (this.downloadUrl)
+        this.$electron.remote.shell.openExternal(this.downloadUrl);
     }
   }
 };
@@ -437,25 +494,32 @@ export default {
   content: "：";
   text-align: left;
 }
+
 .tip {
   text-align: right;
   color: #aaabab;
   font-size: smaller;
   margin-top: 2px;
 }
+
 .tip:after {
   content: " ";
 }
+
 .switch {
   margin: 0 10px;
 }
+
 .warn-info {
   color: #ffc259;
 }
-.clear-history {
+
+.clear-history,
+.check-update {
   margin-top: 10px;
   padding: 2px 20px;
 }
+
 .shortcut {
   text-align: left;
 }
@@ -463,6 +527,7 @@ export default {
 #settings {
   background: #fff;
 }
+
 .fake-title-bar {
   background: #d6d0d5;
   padding: 2px 0;
@@ -478,35 +543,43 @@ body {
   margin: 0 !important;
   background: #eae9ea;
 }
+
 .el-tabs__content {
   background: #eae9ea !important;
 }
+
 .el-tabs .el-tabs__header {
   background: #d6d0d5 !important;
   border-bottom: 1px solid #b5b1b5 !important;
 }
+
 .el-tabs--border-card > .el-tabs__header .el-tabs__item {
   color: #000 !important;
   border-left: #b8b6ba !important;
   border-right: #b8b6ba !important;
 }
+
 .el-tabs--border-card > .el-tabs__header .el-tabs__item.is-active {
   color: #000 !important;
   background-color: #b8b6ba !important;
   border-left: #b8b6ba !important;
   border-right: #b8b6ba !important;
 }
+
 .el-tabs__nav {
   left: 50%;
   transform: translateX(-50%) !important;
 }
+
 .switch .el-slider {
   margin: 0 10px;
 }
+
 .bg-image-container {
   display: flex;
   flex-direction: column;
 }
+
 .bg-image {
   flex: 1;
   margin-right: 5px;
@@ -514,6 +587,7 @@ body {
   width: 160px;
   height: 50px;
 }
+
 .bg-selected {
   border: 2px solid #409eff;
 }
