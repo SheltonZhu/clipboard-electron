@@ -1,7 +1,7 @@
 <template>
   <span
     :class="{ 'is-droppable': isDroppable }"
-    @drop="onCardDrop"
+    @drop.prevent="onCardDrop"
     @dragenter="onCardDragIn"
     @dragleave="onCardDragOut"
   >
@@ -114,6 +114,7 @@ export default {
   },
   methods: {
     onCardDrop() {
+      window.log.info("drop");
       if (this.labelData._id !== this.dragData.table) {
         let newData = Object.assign({}, this.dragData);
         newData.table = this.labelData._id;
@@ -128,12 +129,14 @@ export default {
       this.isDroppable = false;
     },
     onCardDragIn(e) {
+      window.log.info("in");
       this.dragEl = e.target;
       if (this.labelData._id !== this.dragData.table) {
         this.isDroppable = true;
       }
     },
     onCardDragOut(e) {
+      window.log.info("out");
       if (this.dragEl === e.target) this.isDroppable = false;
     },
     onLabelClick() {
