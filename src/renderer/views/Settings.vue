@@ -353,7 +353,10 @@
         <el-tab-pane>
           <span slot="label"><i class="el-icon-info"></i> 关于 </span>
           <div style="text-align: center">
-            <el-row class="row" style="display:flex;align-items:center;">
+            <el-row
+              class="row"
+              style="display:flex;align-items:center;margin: 15px 110px;"
+            >
               <el-image
                 src="/default_icon.png"
                 @click="openGithub"
@@ -371,10 +374,10 @@
             </el-row>
 
             <el-row class="row" v-for="(p, idx) in about" :key="idx">
-              <el-col :span="6">
+              <el-col :span="8">
                 <div class="type">{{ p.split(": ")[0] }}</div>
               </el-col>
-              <el-col :span="18">
+              <el-col :span="16">
                 <div class="shortcut">{{ p.split(": ")[1] }}</div>
               </el-col>
             </el-row>
