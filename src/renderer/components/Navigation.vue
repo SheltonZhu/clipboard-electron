@@ -46,11 +46,18 @@
 
       <!--   收藏栏按钮组   -->
       <div class="clipboard-tag">
-        <!--   剪贴板历史   -->
+        <!--   剪贴板历史标签   -->
         <el-tooltip :disabled="!isSearching" content="剪贴板历史">
           <el-button
-            :class="{ 'is-selected': isSelected }"
-            :style="{ color: labelFontColor }"
+            :style="{
+              color: labelFontColor,
+              color: isSelected
+                ? labelFontColorSelect + '!important'
+                : labelFontColor,
+              background: isSelected
+                ? labelBgColorSelect + '!important'
+                : 'none'
+            }"
             @click="mainLabelClick"
           >
             <spot color="#aaabab" />
@@ -72,11 +79,20 @@
           :key="labelData._id"
           :label-data="labelData"
         />
-        <!--    添加新标签按钮    -->
+        <!--    添加新标签输入框    -->
         <div v-if="newLabelVisible">
           <el-button
-            class="add-box is-selected"
-            style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
+            :style="{
+              color: isSelected
+                ? labelFontColorSelect + '!important'
+                : labelFontColor,
+              background: isSelected
+                ? labelBgColorSelect + '!important'
+                : 'none',
+              'padding-top': '0 !important',
+              'padding-bottom': '0 !important',
+              border: 'none !important'
+            }"
           >
             <spot color="#fe9700" />
             <el-input
@@ -149,6 +165,14 @@ export default {
     labelFontColor: {
       type: String,
       default: "#2c3e50"
+    },
+    labelFontColorSelect: {
+      type: String,
+      default: "#fff"
+    },
+    labelBgColorSelect: {
+      type: String,
+      default: "#b9b9b9d1"
     }
   },
   data: () => {
@@ -430,11 +454,6 @@ export default {
 }
 
 .clipboard-tag .el-button:hover {
-  color: #fff !important;
-  background: #b9b9b9d1 !important;
-}
-
-.clipboard-tag .is-selected {
   color: #fff !important;
   background: #b9b9b9d1 !important;
 }

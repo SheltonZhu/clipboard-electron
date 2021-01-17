@@ -11,8 +11,13 @@
       :content="labelData.name"
     >
       <el-button
-        :class="{ 'is-selected': isSelected }"
-        :style="{ color: labelFontColor }"
+        :style="{
+          color: labelFontColor,
+          color: isSelected
+            ? labelFontColorSelect + '!important'
+            : labelFontColor,
+          background: isSelected ? labelBgColorSelect + '!important' : 'none'
+        }"
         @click="onLabelClick"
         @contextmenu.native="onContextmenu"
         ref="dragBtn"
@@ -31,8 +36,16 @@
     <!--  改名字  -->
     <div v-if="isRenaming" style="display: inline-block">
       <el-button
-        class="add-box is-selected"
-        style="padding-top: 0 !important;padding-bottom: 0 !important;border: none !important;"
+        class="add-box"
+        :style="{
+          color: isSelected
+            ? labelFontColorSelect + '!important'
+            : labelFontColor,
+          background: isSelected ? labelBgColorSelect + '!important' : 'none',
+          'padding-top': '0 !important',
+          'padding-bottom': '0 !important',
+          border: 'none !important'
+        }"
       >
         <spot :color="labelData.color" />
         <el-input
@@ -67,6 +80,14 @@ export default {
     labelFontColor: {
       type: String,
       default: "#2c3e50"
+    },
+    labelFontColorSelect: {
+      type: String,
+      default: "#fff"
+    },
+    labelBgColorSelect: {
+      type: String,
+      default: "#b9b9b9d1"
     }
   },
   components: {

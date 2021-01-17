@@ -17,7 +17,11 @@
       }"
     >
       <el-header>
-        <navigation :labelFontColor="labelFontColor" />
+        <navigation
+          :labelFontColor="labelFontColor"
+          :labelFontColorSelect="labelFontColorSelect"
+          :labelBgColorSelect="labelBgColorSelect"
+        />
       </el-header>
       <el-main>
         <clipboard :table="table" :clipboardData="this.clipboardData" />
@@ -46,7 +50,9 @@ export default {
       bgColor: "#ffffffbf",
       defaultBg: "/bg/default.png",
       imageUrl: "/bg/default.png",
-      labelFontColor: "#2c3e50"
+      labelFontColor: "#2c3e50",
+      labelFontColorSelect: "#fff",
+      labelBgColorSelect: "#b9b9b9d1"
     };
   },
   methods: {
@@ -116,6 +122,8 @@ export default {
       this.imageUrl = config.get("imageUrl");
       this.bgColor = config.get("bgColor");
       this.defaultBg = config.get("defaultBg");
+      this.labelFontColorSelect = config.get("labelFontColorSelect");
+      this.labelBgColorSelect = config.get("labelBgColorSelect");
     },
     onDrop(e) {
       e.preventDefault();

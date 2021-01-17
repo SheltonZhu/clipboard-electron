@@ -85,6 +85,38 @@
               </div>
             </el-col>
           </el-row>
+
+          <el-row class="row vertically-center">
+            <el-col :span="12">
+              <div class="type">标签选中时字体颜色</div>
+            </el-col>
+            <el-col :span="12">
+              <div class="switch">
+                <el-color-picker
+                  v-model="labelFontColorSelect"
+                  show-alpha
+                  :predefine="predefineLabelFontColorsSelect"
+                >
+                </el-color-picker>
+              </div>
+            </el-col>
+          </el-row>
+
+          <el-row class="row vertically-center">
+            <el-col :span="12">
+              <div class="type">标签选中时背景颜色</div>
+            </el-col>
+            <el-col :span="12">
+              <div class="switch">
+                <el-color-picker
+                  v-model="labelBgColorSelect"
+                  show-alpha
+                  :predefine="predefineLabelBgColorsSelect"
+                >
+                </el-color-picker>
+              </div>
+            </el-col>
+          </el-row>
         </el-tab-pane>
 
         <!--    通用    -->
@@ -358,6 +390,10 @@ export default {
         "rgba(239, 38, 85, 1)",
         "rgba(202, 38, 239, 1)"
       ],
+      labelFontColorSelect: "rgba(255, 255, 255, 1)",
+      predefineLabelFontColorsSelect: ["rgba(255, 255, 255, 1)"],
+      labelBgColorSelect: "rgba(185,185,185,0.82)",
+      predefineLabelBgColorsSelect: ["rgba(185, 185, 185, 0.82)"],
       autoBoot: false,
       directPaste: true,
       hideWhenBlur: false,
@@ -423,6 +459,18 @@ export default {
         value: this.labelFontColor
       });
     },
+    labelFontColorSelect() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "labelFontColorSelect",
+        value: this.labelFontColorSelect
+      });
+    },
+    labelBgColorSelect() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "labelBgColorSelect",
+        value: this.labelBgColorSelect
+      });
+    },
     autoBoot() {
       this.$electron.ipcRenderer.send("settings", {
         key: "autoBoot",
@@ -469,6 +517,8 @@ export default {
       this.bgList = config.get("bgList");
       this.bgColor = config.get("bgColor");
       this.labelFontColor = config.get("labelFontColor");
+      this.labelFontColorSelect = config.get("labelFontColorSelect");
+      this.labelBgColorSelect = config.get("labelBgColorSelect");
       this.autoBoot = config.get("autoBoot");
       this.directPaste = config.get("directPaste");
       this.trayIcon = config.get("trayIcon");
@@ -489,7 +539,9 @@ export default {
       });
     },
     selectBg(e) {
-      this.imageUrl = "/bg/" + e.target.src.split("/").pop();
+      const url = e.target.src;
+      if (this.isLocalBg(url)) this.imageUrl = "/bg/" + url.split("/").pop();
+      else this.imageUrl = url;
     },
     clearHistory() {
       this.$electron.remote.getGlobal("shortcut").unregisterEsc();
@@ -511,6 +563,9 @@ export default {
     },
     addRegex() {
       this.regexList.unshift("新规则");
+    },
+    isLocalBg(url) {
+      return url.startsWith("http://localhost:8080/bg/");
     },
     downloadNewVersion() {
       if (this.downloadUrl)
