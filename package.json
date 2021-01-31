@@ -1,6 +1,6 @@
 {
   "name": "clipboard-electron-app",
-  "version": "v1.6.3-beta",
+  "version": "v1.6.4",
   "author": "Shelton Zhu",
   "description": "My Electron clipboard app",
   "repository": {

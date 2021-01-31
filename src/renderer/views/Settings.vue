@@ -41,16 +41,46 @@
           <el-row v-if="bgPic">
             <el-col :offset="12">
               <!--       背景图       -->
-              <div class="bg-image-container">
-                <el-image
-                  :class="{ 'bg-selected': src === imageUrl }"
-                  class="bg-image"
-                  v-for="(src, idx) in bgList"
-                  :key="idx"
-                  :src="src"
-                  fit="cover"
-                  @click="selectBg"
-                ></el-image>
+              <div>
+                <div class="bg-image-container">
+                  <div
+                    style="display: flex;width: 170px;align-items: center;margin-top: 5px;"
+                    v-for="(src, idx) in bgList"
+                    :key="idx"
+                  >
+                    <el-image
+                      :class="{ 'bg-selected': src === imageUrl }"
+                      class="bg-image"
+                      :src="src"
+                      fit="cover"
+                      width="160px"
+                      @click="selectBg"
+                    ></el-image>
+                    <el-button
+                      v-if="src !== imageUrl"
+                      circle
+                      style="padding: 0"
+                      class="el-icon-minus"
+                      @click="
+                        () => {
+                          removeBg(idx);
+                        }
+                      "
+                    ></el-button>
+                  </div>
+                </div>
+                <el-input
+                  style="margin-top:10px;width: 250px"
+                  placeholder="图片地址"
+                  v-model="picUrl"
+                  @keyup.enter.native="addPic"
+                >
+                  <el-button
+                    slot="append"
+                    icon="el-icon-plus"
+                    @click="addPic"
+                  ></el-button>
+                </el-input>
               </div>
             </el-col>
           </el-row>
@@ -303,7 +333,7 @@
           <div style="text-align: center">
             自定义关键字（正则）
             <div
-              style="background: #fff;height: 300px;overflow-y: scroll;margin: 10px 0;"
+              style="background: #fff;height: 400px;overflow-y: scroll;margin: 10px 0;"
             >
               <regex-input
                 v-for="(regex, idx) in regexList"
@@ -323,7 +353,10 @@
         <el-tab-pane>
           <span slot="label"><i class="el-icon-info"></i> 关于 </span>
           <div style="text-align: center">
-            <el-row class="row" style="display:flex;align-items:center;">
+            <el-row
+              class="row"
+              style="display:flex;align-items:center;margin: 15px 110px;"
+            >
               <el-image
                 src="/default_icon.png"
                 @click="openGithub"
@@ -341,10 +374,10 @@
             </el-row>
 
             <el-row class="row" v-for="(p, idx) in about" :key="idx">
-              <el-col :span="6">
+              <el-col :span="8">
                 <div class="type">{{ p.split(": ")[0] }}</div>
               </el-col>
-              <el-col :span="18">
+              <el-col :span="16">
                 <div class="shortcut">{{ p.split(": ")[1] }}</div>
               </el-col>
             </el-row>
@@ -367,13 +400,17 @@ export default {
     return {
       bgBlur: true,
       bgPic: true,
-      bgList: [],
+      bgList: ["/bg/default.png", "/bg/bg1.png", "/bg/bg2.png"],
+      picUrl: "",
       bgColor: "rgba(255, 255, 255, 0.72)",
       predefineColors: [
-        "rgba(255, 255, 255, 0.72)",
-        "rgba(255,179,167, 0.72)",
+        "rgba(255, 255, 255, 0.72)", //原版
+        "rgba(255, 230, 230, 0.68)", //紫粉套
+        "rgba(144, 240, 144, 0.5)", //蓝黄套
+        "rgba(157, 1, 145, 0.27)", //粉黄蓝
+        "rgba(208, 232, 242, 0.52)", //灰蓝
+        "rgba(111, 74, 142, 0.71)", //黑紫
         "rgba(255, 69, 0, 0.68)",
-        "rgba(144, 240, 144, 0.5)",
         "hsla(209, 100%, 56%, 0.73)",
         "rgba(35, 37, 35, 0.71)",
         "rgb(255, 120, 0)",
@@ -382,18 +419,35 @@ export default {
       ],
       labelFontColor: "rgba(44, 62, 80, 1)",
       predefineLabelFontColors: [
-        "#2c3e50",
-        "#fff",
-        "#000",
+        "rgba(44, 62, 80, 1)", //原版
+        "rgba(97, 85, 166, 1)", //紫粉套
+        "rgba(21, 62, 144, 1)", //蓝黄套
+        "rgba(18, 0, 120, 1)", //粉黄蓝
+        "rgba(69, 98, 104, 1)", //灰蓝
+        "rgba(5, 5, 5, 1)", //黑紫
         "rgba(99, 145, 230, 1)",
         "rgba(249, 252, 44, 1)",
         "rgba(239, 38, 85, 1)",
         "rgba(202, 38, 239, 1)"
       ],
       labelFontColorSelect: "rgba(255, 255, 255, 1)",
-      predefineLabelFontColorsSelect: ["rgba(255, 255, 255, 1)"],
+      predefineLabelFontColorsSelect: [
+        "rgba(255, 255, 255, 1)", //原版
+        "rgba(255, 171, 225, 1)", //紫粉套
+        "rgba(255, 250, 164, 1)", //蓝黄套
+        "rgba(254, 205, 26, 1)", //粉黄蓝
+        "rgba(252, 248, 236, 1)", //灰蓝
+        "rgba(235, 235, 235, 1)" //黑紫
+      ],
       labelBgColorSelect: "rgba(185,185,185,0.82)",
-      predefineLabelBgColorsSelect: ["rgba(185, 185, 185, 0.82)"],
+      predefineLabelBgColorsSelect: [
+        "rgba(185, 185, 185, 0.82)", //原版
+        "rgba(166, 133, 226, 1)", //紫粉套
+        "rgba(14, 73, 181, 1)", //蓝黄套
+        "rgba(253, 58, 105, 1)", //粉黄蓝
+        "rgba(121, 163, 177, 1)", //灰蓝
+        "rgba(34, 31, 59, 1)" //黑紫
+      ],
       autoBoot: false,
       directPaste: true,
       hideWhenBlur: false,
@@ -439,6 +493,12 @@ export default {
       this.$electron.ipcRenderer.send("settings", {
         key: "bgPic",
         value: this.bgPic
+      });
+    },
+    bgList() {
+      this.$electron.ipcRenderer.send("settings", {
+        key: "bgList",
+        value: this.bgList
       });
     },
     imageUrl() {
@@ -575,6 +635,13 @@ export default {
       this.$electron.remote.shell.openExternal(
         this.$electron.remote.getGlobal("config").get("github")
       );
+    },
+    addPic() {
+      if (this.picUrl) this.bgList.unshift(this.picUrl);
+      this.picUrl = "";
+    },
+    removeBg(idx) {
+      this.bgList.splice(idx, 1);
     }
   }
 };
@@ -675,8 +742,9 @@ body {
 }
 
 .bg-image-container {
-  display: flex;
-  flex-direction: column;
+  max-height: 150px;
+  overflow-y: scroll;
+  width: 250px;
 }
 
 .bg-image {
