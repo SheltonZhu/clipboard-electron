@@ -309,8 +309,8 @@
                     Alt<i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>Ctrl</el-dropdown-item>
-                    <el-dropdown-item>Shift</el-dropdown-item>
+                    <!--                    <el-dropdown-item>Ctrl</el-dropdown-item>-->
+                    <!--                    <el-dropdown-item>Shift</el-dropdown-item>-->
                   </el-dropdown-menu>
                 </el-dropdown>
                 + 1..9

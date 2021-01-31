@@ -30,7 +30,7 @@ module.exports = {
         // asar: false, // 是否使用 asar 壓縮檔案
         // appId: "myappid.id" + env, // 認證的 appId
         productName: pkg.productName + env,
-        // artifactName: '${name}.${ext}', // 檔案名稱樣板，有 ESLint 記得關掉
+        artifactName: "${productName}-Setup-${version}.${ext}",
         copyright: "Copyright © 2021 SheltonZhu",
         win: {
           legalTrademarks: "clipboard-electron", // 商标
@@ -56,7 +56,6 @@ module.exports = {
           icon: "build/icons/icon.icns"
         },
         nsis: {
-          artifactName: "${productName}-Setup-${version}.${ext}",
           oneClick: false, // 一键安装
           installerIcon: "build/icons/icon.ico",
           uninstallerIcon: "build/icons/icon.ico",
