@@ -625,7 +625,11 @@ export default {
       this.regexList.unshift("新规则");
     },
     isLocalBg(url) {
-      return url.startsWith("http://localhost:8080/bg/");
+      const isDevelopment = this.$electron.remote
+        .getGlobal("config")
+        .get("isDevelopment");
+      if (isDevelopment) return url.startsWith("http://localhost:8080/bg/");
+      else return url.startsWith("app://./bg/");
     },
     downloadNewVersion() {
       if (this.downloadUrl)
