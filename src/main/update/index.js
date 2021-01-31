@@ -9,13 +9,7 @@ export default class AutoUpdater {
   constructor() {
     autoUpdater.autoDownload = false; // 不自動下載更新檔
     this.createListener();
-    if (isDevelopment) {
-      autoUpdater.checkForUpdates();
-    } else {
-      setInterval(() => {
-        autoUpdater.checkForUpdates().then();
-      }, 60000 * 5);
-    }
+    autoUpdater.checkForUpdates();
   }
 
   createListener() {

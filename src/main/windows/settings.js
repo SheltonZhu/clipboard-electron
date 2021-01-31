@@ -1,6 +1,7 @@
 /* global __static */
 
 import { BrowserWindow } from "electron";
+import { autoUpdater } from "electron-updater";
 import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import config from "@/main/config";
 import path from "path";
@@ -61,7 +62,9 @@ export default class SettingsWindow {
       e.preventDefault();
       this.browserWindow.hide();
     });
-
+    this.browserWindow.on("show", () => {
+      autoUpdater.checkForUpdates();
+    });
     if (isDevelopment) {
       //为了让画面显示时没有视觉闪烁，
       this.browserWindow.once("ready-to-show", this.browserWindow.show);
