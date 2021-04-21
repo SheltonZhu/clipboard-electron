@@ -41,32 +41,41 @@ if (!app.requestSingleInstanceLock()) {
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-ipcMain.on("settings", async (event, args) => {
-  mainLog.info("settings: ", args);
-  if (args.key !== "clearHistory") config.set(args.key, args.value);
-  if (args.key === "trayIcon") {
-    if (args.value) {
-      await new AppTray().createTray();
+ipcMain
+  .on("settings", async (event, args) => {
+    mainLog.info("settings: ", args);
+    if (args.key !== "clearHistory") config.set(args.key, args.value);
+    if (args.key === "trayIcon") {
+      if (args.value) {
+        await new AppTray().createTray();
+      } else {
+        if (AppTray.appTray) AppTray.appTray.destroy();
+        AppTray.appTray = undefined;
+      }
+    } else if (args.key === "autoBoot") {
+      app.setLoginItemSettings({
+        openAtLogin: args.value
+      });
+    } else if (args.key === "hideWhenBlur") {
+      if (args.value) {
+        MainWindow.browserWindow.on("blur", MainWindow.browserWindow.hide);
+      } else {
+        MainWindow.browserWindow.removeAllListeners("blur");
+      }
     } else {
-      if (AppTray.appTray) AppTray.appTray.destroy();
-      AppTray.appTray = undefined;
+      MainWindow.browserWindow.webContents.send("change-settings", args);
     }
-  } else if (args.key === "autoBoot") {
-    app.setLoginItemSettings({
-      openAtLogin: args.value
-    });
-  } else if (args.key === "hideWhenBlur") {
-    if (args.value) {
-      MainWindow.browserWindow.on("blur", MainWindow.browserWindow.hide);
+  })
+  .on("linux-paste", async (event, obj) => {
+    if (obj.type === "image") {
+      clipboard.writeImage(obj.content);
     } else {
-      MainWindow.browserWindow.removeAllListeners("blur");
+      clipboard.writeText(obj.content);
     }
-  } else {
-    MainWindow.browserWindow.webContents.send("change-settings", args);
-  }
-});
+  });
 
 let getCurrentWindowIcon = () => {
+  if (process.platform !== "linux") return "";
   const window = windowManager.getActiveWindow();
   let iconBuffer = window.getIcon(32);
   let icon = nativeImage.createFromBuffer(iconBuffer, {

@@ -171,9 +171,23 @@ export default {
         let image = this.$electron.remote.nativeImage.createFromDataURL(
           this.data.copyContent
         );
-        this.$electron.remote.clipboard.writeImage(image);
+        if (process.platform === "linux") {
+          this.$electron.ipcRenderer.send("linux-paste", {
+            type: "image",
+            content: image
+          });
+        } else {
+          this.$electron.remote.clipboard.writeImage(image);
+        }
       } else {
-        this.$electron.remote.clipboard.writeText(this.data.copyContent);
+        if (process.platform === "linux") {
+          this.$electron.ipcRenderer.send("linux-paste", {
+            type: "text",
+            content: this.data.copyContent
+          });
+        } else {
+          this.$electron.remote.clipboard.writeText(this.data.copyContent);
+        }
       }
     },
     write2clipboardAndPaste() {
@@ -446,11 +460,13 @@ export default {
 .box-card .other-info .info {
   display: inline-block;
 }
+
 .box-card .other-info .shortcut {
   float: left;
   display: inline-block;
   margin-top: 1px;
 }
+
 .box-card .other-info .other {
   float: right;
   display: inline-block;

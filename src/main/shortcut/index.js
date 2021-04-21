@@ -6,7 +6,8 @@ export default class GlobalShortcut {
   static registerAltAndV() {
     try {
       globalShortcut.register("Alt+V", () => {
-        global.activeWindow = windowManager.getActiveWindow();
+        if (process.platform !== "linux")
+          global.activeWindow = windowManager.getActiveWindow();
         if (!MainWindow.browserWindow.isVisible())
           MainWindow.browserWindow.show();
       });

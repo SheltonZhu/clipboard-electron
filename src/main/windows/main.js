@@ -73,7 +73,7 @@ export default class MainWindow {
     });
     this.browserWindow.on("show", GlobalShortcut.registerEsc);
     this.browserWindow.on("hide", () => {
-      if (global.activeWindow) {
+      if (global.activeWindow && process.platform !== "linux") {
         global.activeWindow.bringToTop();
         global.activeWindow = undefined;
       }
