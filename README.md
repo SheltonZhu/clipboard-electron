@@ -2,7 +2,7 @@
 ![](https://img.shields.io/github/languages/top/SheltonZhu/clipboard-electron.svg?style=flat)
 ![](https://img.shields.io/github/stars/SheltonZhu/clipboard-electron.svg?style=social)
 
-This app is a clipboard tool programed by [Electron](https://www.electronjs.org/) and [Vuejs](https://vuejs.org/) (UI Component: [Element](https://element.eleme.cn/)). It supports Windows only.
+This app is a clipboard tool programed by [Electron](https://www.electronjs.org/) and [Vue.js](https://vuejs.org/) (UI Component: [Element](https://element.eleme.cn/)). It supports Windows only.
 (Now supports ubuntu20.04 for some features.)
 
 The design style of this app imitates [Paste](https://pasteapp.io/) on Mac.

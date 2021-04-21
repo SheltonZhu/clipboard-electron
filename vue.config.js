@@ -38,11 +38,8 @@ module.exports = {
           signingHashAlgorithms: ["sha1", "sha256"],
           target: [
             {
-              target: "nsis", // 檔案類型
-              arch: [
-                "x64"
-                // "ia32"
-              ] // 檔案位元，越多類型檔案越大
+              target: "nsis",
+              arch: ["x64", "ia32"]
             }
           ]
         },
@@ -50,13 +47,29 @@ module.exports = {
           icon: "build/icons/icon.icns"
         },
         linux: {
-          icon: "build/icons/icon.png"
+          icon: "build/icons/icon.png",
+          target: [
+            {
+              target: "AppImage",
+              arch: ["x64"]
+            },
+            {
+              target: "deb",
+              arch: ["x64"]
+            },
+            {
+              target: "tar.gz",
+              arch: ["x64"]
+            }
+          ],
+          category: "Utility",
+          description: "An Electron & Vue.js clipboard with elementUI support"
         },
         mac: {
           icon: "build/icons/icon.icns"
         },
         nsis: {
-          oneClick: false, // 一键安装
+          oneClick: false,
           installerIcon: "build/icons/icon.ico",
           uninstallerIcon: "build/icons/icon.ico",
           installerHeaderIcon: "build/icons/icon.ico",
