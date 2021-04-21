@@ -72,7 +72,6 @@ See [Electron Documentation](https://www.electronjs.org/docs).
 Set China Mirror
 ```
 ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"
-ELECTRON_CUSTOM_DIR="{{ version }}"
 ```
 ---
 
