@@ -1,37 +1,78 @@
-## Welcome to GitHub Pages
+# Clipboard-Electron
+![](https://img.shields.io/github/languages/top/SheltonZhu/clipboard-electron.svg?style=flat)
+![](https://img.shields.io/github/stars/SheltonZhu/clipboard-electron.svg?style=social)
 
-You can use the [editor on GitHub](https://github.com/SheltonZhu/clipboard-electron/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+This app is a clipboard tool programed by [Electron](https://www.electronjs.org/) and [Vue.js](https://vuejs.org/) (UI Component: [Element](https://element.eleme.cn/)). It supports Windows only.
+(Now supports ubuntu20.04 for some features.)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+The design style of this app imitates [Paste](https://pasteapp.io/) on Mac.
+## Sample
+### Main window
+![main.png](samples/main.png)
+### Setting window
+![setting.png](samples/setting.png)
+![regex.png](samples/regex.png)
 
-### Markdown
+---
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Development
+### Environment
+node `v14.15.2`
 
-```markdown
-Syntax highlighted code block
+npm `6.14.9` or yarn `1.22.10`
 
-# Header 1
-## Header 2
-### Header 3
+vue-cli `4.5.9`
 
-- Bulleted
-- List
+#### Building require
+installation:
+* Windows
+    * windows-build-tools npm package (`npm install --global --production windows-build-tools` from an elevated PowerShell or CMD.exe)
+* Mac
+    * Xcode Command Line Tools.
+* Linux
+    * Python (v2.7 recommended, v3.x.x is not supported).
+    * make.
+    * A C/C++ compiler like GCC.
+    * libxtst-dev and libpng++-dev (`sudo apt-get install libxtst-dev libpng++-dev`).
 
-1. Numbered
-2. List
+Install node-gyp using npm:
 
-**Bold** and _Italic_ and `Code` text
+`npm install -g node-gyp` or `yarn global add node-gyp`
 
-[Link](url) and ![Image](src)
-```
+Then build:
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+`npm run postinstall` or `yarn postinstall`
 
-### Jekyll Themes
+***
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/SheltonZhu/clipboard-electron/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Project setup
+`yarn` or `npm install`
 
-### Support or Contact
+#### Compiles and hot-reloads for development
+`yarn serve` or `npm run serve`
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+#### Compiles and minifies for production
+`yarn build` or `npm run build`
+
+#### Lints and fixes files
+`yarn lint` or `npm run lint`
+
+#### Customize configuration
+See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
+#### Compiles electron app for development
+`yarn electron:serve` or `npm run electron:serve`
+
+#### Compiles and minifies electron app for production
+`yarn electron:build` or `npm run electron:build`
+
+#### Electron document
+See [Electron Documentation](https://www.electronjs.org/docs).
+
+Use mirror:
+`export ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"`
+---
+
+## License
+[MIT](license.txt)
