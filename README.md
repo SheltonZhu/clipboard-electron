@@ -71,7 +71,9 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 See [Electron Documentation](https://www.electronjs.org/docs).
 
 Use mirror:
+
 `export ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"`
+
 ---
 
 ## License
