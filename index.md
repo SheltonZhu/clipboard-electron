@@ -8,10 +8,10 @@ This app is a clipboard tool programed by [Electron](https://www.electronjs.org/
 The design style of this app imitates [Paste](https://pasteapp.io/) on Mac.
 ## Sample
 ### Main window
-![main.png](samples/main.png)
+![main.png](https://github.com/SheltonZhu/clipboard-electron/blob/main/samples/main.png)
 ### Setting window
-![setting.png](samples/setting.png)
-![regex.png](samples/regex.png)
+![setting.png](https://github.com/SheltonZhu/clipboard-electron/blob/main/samples/setting.png)
+![regex.png](https://github.com/SheltonZhu/clipboard-electron/blob/main/samples/regex.png)
 
 ---
 
