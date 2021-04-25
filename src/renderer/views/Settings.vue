@@ -309,8 +309,8 @@
                     Alt<i class="el-icon-arrow-down el-icon--right"></i>
                   </span>
                   <el-dropdown-menu slot="dropdown">
-                    <el-dropdown-item>Ctrl</el-dropdown-item>
-                    <el-dropdown-item>Shift</el-dropdown-item>
+                    <!--                    <el-dropdown-item>Ctrl</el-dropdown-item>-->
+                    <!--                    <el-dropdown-item>Shift</el-dropdown-item>-->
                   </el-dropdown-menu>
                 </el-dropdown>
                 + 1..9
@@ -625,7 +625,11 @@ export default {
       this.regexList.unshift("新规则");
     },
     isLocalBg(url) {
-      return url.startsWith("http://localhost:8080/bg/");
+      const isDevelopment = this.$electron.remote
+        .getGlobal("config")
+        .get("isDevelopment");
+      if (isDevelopment) return url.startsWith("http://localhost:8080/bg/");
+      else return url.startsWith("app://./bg/");
     },
     downloadNewVersion() {
       if (this.downloadUrl)

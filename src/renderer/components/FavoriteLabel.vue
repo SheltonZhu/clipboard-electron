@@ -291,14 +291,11 @@ export default {
   border-color: #ffffff00;
   border-width: 1px;
   border-style: double;
+  cursor: pointer;
 }
 
-.context-menu .circle-border {
+.context-menu .circle-border:hover {
   border-color: #0a98cb;
-}
-
-.context-menu .is-selected-color {
-  border-color: #15bbf9;
 }
 
 .rename-label input {
