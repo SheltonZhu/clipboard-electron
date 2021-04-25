@@ -1,6 +1,6 @@
 {
   "name": "clipboard-electron-app",
-  "version": "v1.6.4",
+  "version": "v1.6.5",
   "author": "Shelton Zhu <498220739@qq.com> (https://github.com/SheltonZhu)",
   "description": "An Electron & Vue.js clipboard with elementUI support",
   "repository": {
