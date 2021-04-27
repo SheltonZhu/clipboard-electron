@@ -171,23 +171,9 @@ export default {
         let image = this.$electron.remote.nativeImage.createFromDataURL(
           this.data.copyContent
         );
-        if (process.platform === "linux") {
-          this.$electron.ipcRenderer.send("linux-paste", {
-            type: "image",
-            content: image
-          });
-        } else {
-          this.$electron.remote.clipboard.writeImage(image);
-        }
+        this.$electron.remote.clipboard.writeImage(image);
       } else {
-        if (process.platform === "linux") {
-          this.$electron.ipcRenderer.send("linux-paste", {
-            type: "text",
-            content: this.data.copyContent
-          });
-        } else {
-          this.$electron.remote.clipboard.writeText(this.data.copyContent);
-        }
+        this.$electron.remote.clipboard.writeText(this.data.copyContent);
       }
     },
     write2clipboardAndPaste() {
