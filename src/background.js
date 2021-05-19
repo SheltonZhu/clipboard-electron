@@ -43,38 +43,30 @@ if (!app.requestSingleInstanceLock()) {
 protocol.registerSchemesAsPrivileged([
   { scheme: "app", privileges: { secure: true, standard: true } }
 ]);
-ipcMain
-  .on("settings", async (event, args) => {
-    mainLog.info("settings: ", args);
-    if (args.key !== "clearHistory") config.set(args.key, args.value);
-    if (args.key === "trayIcon") {
-      if (args.value) {
-        await new AppTray().createTray();
-      } else {
-        if (AppTray.appTray) AppTray.appTray.destroy();
-        AppTray.appTray = undefined;
-      }
-    } else if (args.key === "autoBoot") {
-      app.setLoginItemSettings({
-        openAtLogin: args.value
-      });
-    } else if (args.key === "hideWhenBlur") {
-      if (args.value) {
-        MainWindow.browserWindow.on("blur", MainWindow.browserWindow.hide);
-      } else {
-        MainWindow.browserWindow.removeAllListeners("blur");
-      }
+ipcMain.on("settings", async (event, args) => {
+  mainLog.info("settings: ", args);
+  if (args.key !== "clearHistory") config.set(args.key, args.value);
+  if (args.key === "trayIcon") {
+    if (args.value) {
+      await new AppTray().createTray();
     } else {
-      MainWindow.browserWindow.webContents.send("change-settings", args);
+      if (AppTray.appTray) AppTray.appTray.destroy();
+      AppTray.appTray = undefined;
     }
-  })
-  .on("linux-paste", async (event, obj) => {
-    if (obj.type === "image") {
-      clipboard.writeImage(obj.content);
+  } else if (args.key === "autoBoot") {
+    app.setLoginItemSettings({
+      openAtLogin: args.value
+    });
+  } else if (args.key === "hideWhenBlur") {
+    if (args.value) {
+      MainWindow.browserWindow.on("blur", MainWindow.browserWindow.hide);
     } else {
-      clipboard.writeText(obj.content);
+      MainWindow.browserWindow.removeAllListeners("blur");
     }
-  });
+  } else {
+    MainWindow.browserWindow.webContents.send("change-settings", args);
+  }
+});
 
 let getCurrentWindowIcon = () => {
   if (process.platform === "linux") return "";

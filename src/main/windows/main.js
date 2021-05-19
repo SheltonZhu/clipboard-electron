@@ -5,7 +5,7 @@ import { createProtocol } from "vue-cli-plugin-electron-builder/lib";
 import path from "path";
 import config from "@/main/config";
 import GlobalShortcut from "@/main/shortcut";
-
+import os from "os";
 const isDevelopment = config.get("isDevelopment");
 
 export default class MainWindow {
@@ -28,7 +28,7 @@ export default class MainWindow {
         width: display.width,
         height: 472,
         x: 0,
-        y: display.height - 472,
+        y: os.platform() === "linux" ? display.height : display.height - 472,
         backgroundColor: "#00000000",
         transparent: true,
         frame: false,
